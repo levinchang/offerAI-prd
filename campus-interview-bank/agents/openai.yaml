@@ -1,4 +1,0 @@
-interface:
-  display_name: "Campus Interview Bank"
-  short_description: "Campus non-tech interview bank for campus recruiting prep."
-  default_prompt: "Use $campus-interview-bank to build a campus-only interview question bank for one company and non-technical role."

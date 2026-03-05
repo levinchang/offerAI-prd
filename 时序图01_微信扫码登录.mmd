@@ -1,0 +1,24 @@
+sequenceDiagram
+    autonumber
+    participant U as 用户浏览器
+    participant FE as 前端Web
+    participant BE as 后端API
+    participant WX as 微信开放平台
+
+    U->>FE: 访问首页/任意需要登录的页面
+    FE->>BE: 请求登录二维码接口
+    BE->>WX: 创建扫码登录会话(redirect_url,state等)
+    WX-->>BE: 返回二维码URL/scene信息
+    BE-->>FE: 返回二维码URL
+    FE-->>U: 展示微信扫码登录二维码
+
+    Note over U,WX: 用户用微信App扫码并确认登录
+
+    WX->>BE: 回调(携带code/state等)
+    BE->>WX: 换取access_token/openid
+    WX-->>BE: 返回openid及用户信息
+    BE->>BE: 查询/创建用户记录(按openid)
+    BE->>BE: 生成JWT/Session(含用户ID/过期时间)
+    BE-->>FE: 登录成功回调(重定向到前端并带token)
+    FE->>FE: 保存token(如LocalStorage/Cookie)
+    FE-->>U: 显示已登录状态(头像/昵称)

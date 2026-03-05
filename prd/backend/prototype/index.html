@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offer信息站 - 管理后台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#7C3AED', 600: '#6D28D9', 700: '#5B21B6' },
+            surface: '#FAF5FF',
+            ink: '#4C1D95',
+          },
+          fontFamily: { sans: ['Fira Sans', 'sans-serif'], mono: ['Fira Code', 'monospace'] },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Fira Sans', sans-serif; }
+    .transition-default { transition: color 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .menu-item { cursor: pointer; }
+    .menu-item:hover { background-color: rgba(124, 58, 237, 0.08); }
+    .menu-item.active { background-color: rgba(124, 58, 237, 0.12); color: #5B21B6; font-weight: 500; }
+    table tbody tr:hover { background-color: #f8fafc; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-slate-800">
+  <div class="flex min-h-screen">
+    <!-- 左侧菜单 220px -->
+    <aside class="w-[220px] flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-4 border-b border-gray-200">
+        <div class="font-mono font-semibold text-ink">Offer 管理后台</div>
+      </div>
+      <nav class="flex-1 overflow-y-auto py-2">
+        <div class="menu-group">
+          <div class="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">飞书同步</div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="feishu-config">
+            <span class="inline-flex items-center gap-2"><i data-lucide="settings" class="w-4 h-4"></i>配置</span>
+          </div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="feishu-task">
+            <span class="inline-flex items-center gap-2"><i data-lucide="list-checks" class="w-4 h-4"></i>任务</span>
+          </div>
+        </div>
+        <div class="menu-group mt-2">
+          <div class="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">校招岗位</div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="campus-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="briefcase" class="w-4 h-4"></i>岗位列表</span>
+          </div>
+        </div>
+        <div class="menu-group mt-2">
+          <div class="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">事业编岗位</div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="civil-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="building-2" class="w-4 h-4"></i>岗位列表</span>
+          </div>
+        </div>
+        <div class="menu-group mt-2">
+          <div class="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">面试资料</div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="doc-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i>资料列表</span>
+          </div>
+        </div>
+        <div class="menu-group mt-2">
+          <div class="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">会员与订单</div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="order-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="shopping-cart" class="w-4 h-4"></i>订单列表</span>
+          </div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="member-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i>会员列表</span>
+          </div>
+        </div>
+        <div class="menu-group mt-2">
+          <div class="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">用户与反馈</div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="user-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="user-circle" class="w-4 h-4"></i>用户列表</span>
+          </div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="feedback-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="message-square" class="w-4 h-4"></i>反馈列表</span>
+          </div>
+        </div>
+        <div class="menu-group mt-2">
+          <div class="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">系统设置</div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="admin-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4"></i>管理员管理</span>
+          </div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="dict-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4"></i>字典管理</span>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 右侧主区域 -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- 顶栏 -->
+      <header class="h-14 flex-shrink-0 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+        <div class="font-mono text-lg font-semibold text-ink">Offer信息站 - 管理后台</div>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-slate-600">管理员</span>
+          <button type="button" class="text-sm text-slate-500 hover:text-primary cursor-pointer transition-default" onclick="logout()">
+            退出登录
+          </button>
+        </div>
+      </header>
+
+      <!-- 主内容区 -->
+      <main class="flex-1 overflow-auto p-6">
+        <!-- 飞书同步 - 配置 -->
+        <section id="page-feishu-config" class="page active">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-slate-800">飞书同步配置</h2>
+            <button type="button" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-600 cursor-pointer transition-default" onclick="showManualSyncModal()">
+              手动同步
+            </button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">数据类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">飞书表格ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">飞书视图ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">同步间隔(分钟)</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">自动同步</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">上次同步时间</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4">校招</td>
+                  <td class="py-3 px-4">baseXXX</td>
+                  <td class="py-3 px-4">—</td>
+                  <td class="py-3 px-4">60</td>
+                  <td class="py-3 px-4">开</td>
+                  <td class="py-3 px-4 text-slate-500">2025-03-04 10:00</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showFeishuConfigDrawer('campus')">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer" onclick="showTestConnectionModal('校招')">测试连接</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4">事业编</td>
+                  <td class="py-3 px-4">baseYYY</td>
+                  <td class="py-3 px-4">—</td>
+                  <td class="py-3 px-4">60</td>
+                  <td class="py-3 px-4">开</td>
+                  <td class="py-3 px-4 text-slate-500">2025-03-04 10:00</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showFeishuConfigDrawer('civil')">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer" onclick="showTestConnectionModal('事业编')">测试连接</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 飞书同步 - 任务 -->
+        <section id="page-feishu-task" class="page">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-slate-800">飞书同步任务</h2>
+            <button type="button" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-600 cursor-pointer transition-default" onclick="showManualSyncModal()">
+              手动同步
+            </button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">数据类型</label>
+                <select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                  <option>全部</option>
+                  <option>校招</option>
+                  <option>事业编</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">状态</label>
+                <select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                  <option>全部</option>
+                  <option>处理中</option>
+                  <option>完成</option>
+                  <option>失败</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">触发方式</label>
+                <select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                  <option>全部</option>
+                  <option>自动</option>
+                  <option>手动</option>
+                </select>
+              </div>
+              <div class="flex items-end gap-2">
+                <button type="button" class="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 cursor-pointer transition-default">重置</button>
+                <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-600 cursor-pointer transition-default">搜索</button>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">任务ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">数据类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">触发方式</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">新增/更新/跳过/失败</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">开始时间</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">完成时间</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4">1001</td>
+                  <td class="py-3 px-4">校招</td>
+                  <td class="py-3 px-4">自动</td>
+                  <td class="py-3 px-4"><span class="text-green-600">完成</span></td>
+                  <td class="py-3 px-4">2 / 5 / 0 / 0</td>
+                  <td class="py-3 px-4">2025-03-04 10:00</td>
+                  <td class="py-3 px-4">2025-03-04 10:01</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showTaskDetailDrawer()">查看详情</button>
+                    <button type="button" class="text-slate-400 cursor-not-allowed" disabled>重试</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4">1002</td>
+                  <td class="py-3 px-4">事业编</td>
+                  <td class="py-3 px-4">手动</td>
+                  <td class="py-3 px-4"><span class="text-red-600">失败</span></td>
+                  <td class="py-3 px-4">0 / 0 / 0 / 3</td>
+                  <td class="py-3 px-4">2025-03-04 09:00</td>
+                  <td class="py-3 px-4">—</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showTaskDetailDrawer()">查看详情</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer">重试</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
+            <span>共 2 条，每页 20 条</span>
+            <div class="flex gap-2"><button type="button" class="px-3 py-1 border rounded cursor-pointer hover:bg-gray-50" disabled>上一页</button><button type="button" class="px-3 py-1 border rounded cursor-pointer hover:bg-gray-50">下一页</button></div>
+          </div>
+        </section>
+
+        <!-- 校招岗位列表 -->
+        <section id="page-campus-list" class="page">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-slate-800">校招岗位列表</h2>
+            <button type="button" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-600 cursor-pointer transition-default" onclick="showCampusEdit()">
+              新增岗位
+            </button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-3">
+              <div><label class="block text-xs text-slate-500 mb-1">企业名称</label><input type="text" placeholder="模糊搜索" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label class="block text-xs text-slate-500 mb-1">工作城市</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">企业类型</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>国企</option><option>民企</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">所属行业</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">招聘类型</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option></select></div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div><label class="block text-xs text-slate-500 mb-1">上架状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>已上架</option><option>未上架</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">来源标签</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>飞书同步</option><option>人工增加</option></select></div>
+              <div class="flex items-end gap-2 col-span-2">
+                <button type="button" class="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 cursor-pointer transition-default">重置</button>
+                <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-600 cursor-pointer transition-default">搜索</button>
+              </div>
+            </div>
+          </div>
+          <div id="campus-batch-bar" class="mb-4 py-2 px-4 bg-primary/10 rounded-lg flex items-center gap-4">
+            <span class="text-sm text-slate-700">已选 <strong>0</strong> 项</span>
+            <button type="button" class="text-sm text-primary hover:underline cursor-pointer">批量上架</button>
+            <button type="button" class="text-sm text-primary hover:underline cursor-pointer">批量下架</button>
+            <button type="button" class="text-sm text-red-600 hover:underline cursor-pointer">批量删除</button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm min-w-[1000px]">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 w-10"><input type="checkbox" class="rounded cursor-pointer" /></th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">岗位ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">企业名称</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">招聘岗位</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">工作城市</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">企业类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">来源</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">上架状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">更新时间</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4"><input type="checkbox" class="rounded cursor-pointer" /></td>
+                  <td class="py-3 px-4">1001</td>
+                  <td class="py-3 px-4">示例科技</td>
+                  <td class="py-3 px-4">后端开发</td>
+                  <td class="py-3 px-4">北京</td>
+                  <td class="py-3 px-4">民企</td>
+                  <td class="py-3 px-4">飞书同步</td>
+                  <td class="py-3 px-4">已上架</td>
+                  <td class="py-3 px-4">2025-03-04</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">查看</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showCampusEdit()">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">下架</button>
+                    <button type="button" class="text-red-600 hover:underline cursor-pointer">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4"><input type="checkbox" class="rounded cursor-pointer" /></td>
+                  <td class="py-3 px-4">1002</td>
+                  <td class="py-3 px-4">某国企集团</td>
+                  <td class="py-3 px-4">产品经理</td>
+                  <td class="py-3 px-4">上海</td>
+                  <td class="py-3 px-4">国企</td>
+                  <td class="py-3 px-4">人工增加</td>
+                  <td class="py-3 px-4">未上架</td>
+                  <td class="py-3 px-4">2025-03-03</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">查看</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showCampusEdit()">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">上架</button>
+                    <button type="button" class="text-red-600 hover:underline cursor-pointer">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4"><input type="checkbox" class="rounded cursor-pointer" /></td>
+                  <td class="py-3 px-4">1003</td>
+                  <td class="py-3 px-4">外企中国</td>
+                  <td class="py-3 px-4">算法实习</td>
+                  <td class="py-3 px-4">深圳</td>
+                  <td class="py-3 px-4">外企</td>
+                  <td class="py-3 px-4">飞书同步</td>
+                  <td class="py-3 px-4">未上架</td>
+                  <td class="py-3 px-4">2025-03-02</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">查看</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showCampusEdit()">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">上架</button>
+                    <button type="button" class="text-red-600 hover:underline cursor-pointer">删除</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
+            <span>共 3 条，每页 20 条</span>
+            <div class="flex gap-2"><button type="button" class="px-3 py-1 border rounded cursor-pointer hover:bg-gray-50" disabled>上一页</button><button type="button" class="px-3 py-1 border rounded cursor-pointer hover:bg-gray-50">下一页</button></div>
+          </div>
+        </section>
+
+        <!-- 事业编岗位列表 -->
+        <section id="page-civil-list" class="page">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-slate-800">事业编岗位列表</h2>
+            <button type="button" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-600 cursor-pointer transition-default" onclick="showCivilEditDrawer()">新增岗位</button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div><label class="block text-xs text-slate-500 mb-1">公告标题</label><input type="text" placeholder="模糊" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label class="block text-xs text-slate-500 mb-1">省份</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">类型</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>事业单位</option><option>国企</option><option>公务员</option><option>遴选</option><option>大学生村官</option><option>银行</option><option>教师编</option><option>其他</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">上架状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>已上架</option><option>未上架</option></select></div>
+              <div class="flex items-end gap-2"><button type="button" class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 cursor-pointer">重置</button><button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm cursor-pointer">搜索</button></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm min-w-[900px]">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 w-10"><input type="checkbox" class="rounded cursor-pointer" /></th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">岗位ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">公告标题</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">省份</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">报名截止</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">来源</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">上架状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4"><input type="checkbox" class="rounded cursor-pointer" /></td><td class="py-3 px-4">2001</td><td class="py-3 px-4">某省事业单位招聘</td><td class="py-3 px-4">北京</td><td class="py-3 px-4">事业单位</td><td class="py-3 px-4">2025-04-01</td><td class="py-3 px-4">人工增加</td><td class="py-3 px-4">未上架</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showCivilEditDrawer()">编辑</button><button type="button" class="text-primary hover:underline cursor-pointer">上架</button></td></tr>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4"><input type="checkbox" class="rounded cursor-pointer" /></td><td class="py-3 px-4">2002</td><td class="py-3 px-4">某市国企招聘公告</td><td class="py-3 px-4">上海</td><td class="py-3 px-4">国企</td><td class="py-3 px-4">2025-04-15</td><td class="py-3 px-4">飞书同步</td><td class="py-3 px-4">已上架</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showCivilEditDrawer()">编辑</button><button type="button" class="text-primary hover:underline cursor-pointer">下架</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">共 2 条，每页 20 条</div>
+        </section>
+
+        <!-- 面试资料列表 -->
+        <section id="page-doc-list" class="page">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-slate-800">面试资料管理</h2>
+            <button type="button" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-600 cursor-pointer transition-default" onclick="showDocEditDrawer()">新增资料</button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div><label class="block text-xs text-slate-500 mb-1">标题</label><input type="text" placeholder="模糊" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label class="block text-xs text-slate-500 mb-1">行业</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>草稿</option><option>已上架</option><option>已下架</option></select></div>
+              <div class="flex items-end gap-2"><button type="button" class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 cursor-pointer">搜索</button></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">资料ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">标题</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">行业</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">价格</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">预览页数</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">销量</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">3001</td><td class="py-3 px-4">互联网大厂面经</td><td class="py-3 px-4">IT</td><td class="py-3 px-4">¥9.9</td><td class="py-3 px-4">3</td><td class="py-3 px-4">已上架</td><td class="py-3 px-4">128</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showDocEditDrawer()">编辑</button><button type="button" class="text-primary hover:underline cursor-pointer">下架</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">共 1 条</div>
+        </section>
+
+        <!-- 订单列表 -->
+        <section id="page-order-list" class="page">
+          <h2 class="text-xl font-semibold text-slate-800 mb-4">订单管理</h2>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div><label class="block text-xs text-slate-500 mb-1">时间范围</label><input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /> — <input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mt-1" /></div>
+              <div><label class="block text-xs text-slate-500 mb-1">用户ID/昵称</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label class="block text-xs text-slate-500 mb-1">商品类型</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>会员</option><option>资料</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">订单状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>待支付</option><option>已支付</option></select></div>
+              <div class="flex items-end"><button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm cursor-pointer">搜索</button></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">订单号</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">用户</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">商品名称</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">商品类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">原价/实付</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">支付渠道</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">支付时间</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">ORD20250304001</td><td class="py-3 px-4">用户昵称</td><td class="py-3 px-4">校招会员-1年</td><td class="py-3 px-4">会员</td><td class="py-3 px-4">¥99 / ¥99</td><td class="py-3 px-4">微信</td><td class="py-3 px-4">已支付</td><td class="py-3 px-4">2025-03-04 10:00</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer" onclick="showOrderDetailDrawer()">查看详情</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">共 1 条</div>
+        </section>
+
+        <!-- 会员列表 -->
+        <section id="page-member-list" class="page">
+          <h2 class="text-xl font-semibold text-slate-800 mb-4">会员管理</h2>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">用户ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">昵称</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">校招会员到期</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">事业编会员到期</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">已购资料</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">8001</td><td class="py-3 px-4">示例用户</td><td class="py-3 px-4">2026-03-04</td><td class="py-3 px-4">—</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer">查看已购资料(2)</button></td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showExtendMemberModal('campus')">延长校招</button><button type="button" class="text-primary hover:underline cursor-pointer" onclick="showExtendMemberModal('civil')">延长事业编</button></td></tr>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">8002</td><td class="py-3 px-4">另一用户</td><td class="py-3 px-4">—</td><td class="py-3 px-4">2025-12-31</td><td class="py-3 px-4">—</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showExtendMemberModal('campus')">延长校招</button><button type="button" class="text-primary hover:underline cursor-pointer" onclick="showExtendMemberModal('civil')">延长事业编</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">共 2 条</div>
+        </section>
+
+        <!-- 用户列表 -->
+        <section id="page-user-list" class="page">
+          <h2 class="text-xl font-semibold text-slate-800 mb-4">用户列表</h2>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div><label class="block text-xs text-slate-500 mb-1">注册时间</label><input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /> — <input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mt-1" /></div>
+              <div><label class="block text-xs text-slate-500 mb-1">会员状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>校招会员</option><option>事业编会员</option><option>非会员</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">账号状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>正常</option><option>已禁用</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">UTM 来源</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div class="flex items-end"><button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm cursor-pointer">搜索</button></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">用户ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">头像</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">昵称</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">手机号</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">邮箱</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">注册时间</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">校招/事业编到期</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">账号状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">8001</td><td class="py-3 px-4"><div class="w-8 h-8 rounded-full bg-gray-200"></div></td><td class="py-3 px-4">示例用户</td><td class="py-3 px-4">138****0001</td><td class="py-3 px-4">user@example.com</td><td class="py-3 px-4">2025-01-01</td><td class="py-3 px-4">2026-03-04 / —</td><td class="py-3 px-4">正常</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2">详情</button><button type="button" class="text-red-600 hover:underline cursor-pointer">禁用</button></td></tr>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">8002</td><td class="py-3 px-4"><div class="w-8 h-8 rounded-full bg-gray-200"></div></td><td class="py-3 px-4">另一用户</td><td class="py-3 px-4">—</td><td class="py-3 px-4">—</td><td class="py-3 px-4">2025-02-01</td><td class="py-3 px-4">— / —</td><td class="py-3 px-4">已禁用</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2">详情</button><button type="button" class="text-green-600 hover:underline cursor-pointer">启用</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">共 2 条</div>
+        </section>
+
+        <!-- 反馈列表 -->
+        <section id="page-feedback-list" class="page">
+          <h2 class="text-xl font-semibold text-slate-800 mb-4">反馈处理</h2>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div><label class="block text-xs text-slate-500 mb-1">处理状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>待处理</option><option>处理中</option><option>已完成</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">内容类型</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>校招</option><option>事业编</option><option>资料</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">时间范围</label><input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div class="flex items-end"><button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm cursor-pointer">搜索</button></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">反馈ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">用户</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">内容类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">反馈类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">处理状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">创建时间</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">9001</td><td class="py-3 px-4">用户昵称</td><td class="py-3 px-4">校招</td><td class="py-3 px-4">链接失效</td><td class="py-3 px-4">待处理</td><td class="py-3 px-4">2025-03-04</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer">处理</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">共 1 条</div>
+        </section>
+
+        <!-- 管理员管理 -->
+        <section id="page-admin-list" class="page">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-slate-800">管理员管理</h2>
+            <button type="button" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-600 cursor-pointer transition-default" onclick="showAdminEditDrawer(true)">新增管理员</button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">用户名</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">姓名/备注</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">最后登录</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">Admin</td><td class="py-3 px-4">超级管理员</td><td class="py-3 px-4">启用</td><td class="py-3 px-4">2025-03-04 09:00</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer" onclick="showAdminEditDrawer(false)">编辑</button></td></tr>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">operator1</td><td class="py-3 px-4">运营</td><td class="py-3 px-4">启用</td><td class="py-3 px-4">2025-03-03 18:00</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showAdminEditDrawer(false)">编辑</button><button type="button" class="text-red-600 hover:underline cursor-pointer">禁用</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">默认超级管理员：Admin / admin1234</div>
+        </section>
+
+        <!-- 字典管理：字段列表，点击进入详情编辑枚举内容 -->
+        <section id="page-dict-list" class="page">
+          <h2 class="text-xl font-semibold text-slate-800 mb-4">字典管理</h2>
+          <div class="flex gap-2 mb-4 border-b border-gray-200">
+            <button type="button" id="dict-tab-campus" class="dict-tab px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary cursor-pointer" onclick="switchDictTab('campus')">校招表字典</button>
+            <button type="button" id="dict-tab-civil" class="dict-tab px-4 py-2 text-sm text-slate-500 cursor-pointer hover:text-slate-700" onclick="switchDictTab('civil')">事业编岗位字典</button>
+          </div>
+          <p class="text-sm text-slate-500 mb-3">列表为「字段」，类型为枚举的字段可点击进入详情编辑枚举值。后续可扩展：新增字段（必填/非必填、类型、枚举值或数值范围等）。</p>
+          <div id="dict-panel-campus">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-slate-600">字段列表（点击行进入详情编辑枚举内容）</span>
+              <button type="button" class="text-sm text-slate-500 border border-gray-200 rounded px-3 py-1.5 cursor-pointer hover:bg-gray-50" title="后续扩展">新增字段</button>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200"><tr><th class="text-left py-3 px-4 font-medium text-slate-700">字段名</th><th class="text-left py-3 px-4 font-medium text-slate-700">字段键名</th><th class="text-left py-3 px-4 font-medium text-slate-700">字段类型</th><th class="text-left py-3 px-4 font-medium text-slate-700">必填</th><th class="text-left py-3 px-4 font-medium text-slate-700">操作</th></tr></thead>
+                <tbody>
+                  <tr class="border-b border-gray-100 cursor-pointer hover:bg-gray-50" onclick="showDictFieldDetailDrawer('招聘类型', 'recruit_type')"><td class="py-3 px-4">招聘类型</td><td class="py-3 px-4">recruit_type</td><td class="py-3 px-4">枚举</td><td class="py-3 px-4">是</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer" onclick="event.stopPropagation(); showDictFieldDetailDrawer('招聘类型', 'recruit_type')">编辑</button></td></tr>
+                  <tr class="border-b border-gray-100 cursor-pointer hover:bg-gray-50" onclick="showDictFieldDetailDrawer('所属行业', 'industry')"><td class="py-3 px-4">所属行业</td><td class="py-3 px-4">industry</td><td class="py-3 px-4">枚举</td><td class="py-3 px-4">否</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer" onclick="event.stopPropagation(); showDictFieldDetailDrawer('所属行业', 'industry')">编辑</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="dict-panel-civil" class="hidden">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-slate-600">字段列表（点击行进入详情编辑枚举内容）</span>
+              <button type="button" class="text-sm text-slate-500 border border-gray-200 rounded px-3 py-1.5 cursor-pointer hover:bg-gray-50" title="后续扩展">新增字段</button>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200"><tr><th class="text-left py-3 px-4 font-medium text-slate-700">字段名</th><th class="text-left py-3 px-4 font-medium text-slate-700">字段键名</th><th class="text-left py-3 px-4 font-medium text-slate-700">字段类型</th><th class="text-left py-3 px-4 font-medium text-slate-700">必填</th><th class="text-left py-3 px-4 font-medium text-slate-700">操作</th></tr></thead>
+                <tbody>
+                  <tr class="border-b border-gray-100 cursor-pointer hover:bg-gray-50" onclick="showDictFieldDetailDrawer('类型', 'unit_type')"><td class="py-3 px-4">类型</td><td class="py-3 px-4">unit_type</td><td class="py-3 px-4">枚举</td><td class="py-3 px-4">是</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer" onclick="event.stopPropagation(); showDictFieldDetailDrawer('类型', 'unit_type')">编辑</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- 校招岗位编辑抽屉（示例） -->
+  <div id="drawer-campus-edit" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeCampusEdit()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-800">校招岗位编辑</h3>
+        <button type="button" onclick="closeCampusEdit()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-default">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-6">
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">基础信息</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2"><label class="block text-sm text-slate-600 mb-1">企业名称 <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="≤100字" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">企业类型 <span class="text-red-500">*</span></label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg"><option>民企</option><option>国企</option><option>外企</option></select></div>
+            <div><label class="block text-sm text-slate-600 mb-1">工作城市</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div class="col-span-2"><label class="block text-sm text-slate-600 mb-1">招聘岗位 <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">招聘类型 <span class="text-red-500">*</span></label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg" multiple><option>26届春招</option><option>日常实习</option></select></div>
+            <div><label class="block text-sm text-slate-600 mb-1">所属行业</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">时间与要求</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-sm text-slate-600 mb-1">网申开始日期</label><input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">网申截止日期</label><input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div class="col-span-2"><label class="block text-sm text-slate-600 mb-1">毕业生要求</label><textarea class="w-full px-3 py-2 border border-gray-200 rounded-lg" rows="3"></textarea></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">链接与来源</h4>
+          <div class="space-y-4">
+            <div><label class="block text-sm text-slate-600 mb-1">投递链接 <span class="text-red-500">*</span></label><input type="url" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="https://" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">原文链接</label><input type="url" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">运营控制</h4>
+          <div class="space-y-3">
+            <div><label class="block text-sm text-slate-600 mb-1">来源标签</label><span class="text-slate-500">人工增加（只读）</span></div>
+            <div><label class="block text-sm text-slate-600 mb-1">上架状态</label><span class="text-slate-500">未上架（只读，通过下方按钮操作）</span></div>
+            <div class="flex items-center gap-2"><input type="checkbox" id="unpublish_lock" class="rounded cursor-pointer" /><label for="unpublish_lock" class="text-sm text-slate-600 cursor-pointer">手动锁定（飞书不同步覆盖）</label></div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky bottom-0 p-6 bg-white border-t border-gray-200 flex justify-end gap-3">
+        <button type="button" onclick="closeCampusEdit()" class="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-default">取消</button>
+        <button type="button" class="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-default">仅保存</button>
+        <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 cursor-pointer transition-default">保存并上架</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 飞书同步配置编辑抽屉 -->
+  <div id="drawer-feishu-config" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeFeishuConfigDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-xl bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 id="feishu-config-title" class="text-lg font-semibold text-slate-800">编辑配置</h3>
+        <button type="button" onclick="closeFeishuConfigDrawer()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-sm text-slate-600 mb-1">数据类型</label><span class="text-slate-500">校招/事业编（只读）</span></div>
+        <div><label class="block text-sm text-slate-600 mb-1">飞书 App ID <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="应用 App ID" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">飞书 App Secret <span class="text-red-500">*</span></label><input type="password" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="录入后脱敏展示" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">飞书 App Token</label><input type="password" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="可选，或由 Secret 刷新" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">飞书表格ID <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">飞书视图ID</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">字段映射配置 (JSON) <span class="text-red-500">*</span></label><textarea class="w-full px-3 py-2 border border-gray-200 rounded-lg font-mono text-sm" rows="6" placeholder='{"飞书列名":"系统字段名"}'></textarea></div>
+        <div><label class="block text-sm text-slate-600 mb-1">同步间隔(分钟) <span class="text-red-500">*</span></label><input type="number" min="5" max="1440" value="60" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div class="flex items-center gap-2"><input type="checkbox" id="auto_sync" checked class="rounded cursor-pointer" /><label for="auto_sync" class="text-sm text-slate-600 cursor-pointer">自动同步开关</label></div>
+      </div>
+      <div class="sticky bottom-0 p-6 bg-white border-t border-gray-200 flex justify-end gap-3">
+        <button type="button" onclick="closeFeishuConfigDrawer()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">取消</button>
+        <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 面试资料编辑抽屉 -->
+  <div id="drawer-doc-edit" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeDocEditDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-xl bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-800">面试资料 - 新增/编辑</h3>
+        <button type="button" onclick="closeDocEditDrawer()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
+          <p class="text-sm text-slate-500 mb-2">上传 PDF 或 DOCX，单文件 ≤20MB</p>
+          <button type="button" class="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 cursor-pointer">选择文件</button>
+        </div>
+        <div><label class="block text-sm text-slate-600 mb-1">标题 <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">简介</label><textarea class="w-full px-3 py-2 border border-gray-200 rounded-lg" rows="3"></textarea></div>
+        <div><label class="block text-sm text-slate-600 mb-1">行业</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">企业标签（逗号分隔）</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="腾讯,字节" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">价格(元) <span class="text-red-500">*</span></label><input type="number" min="0" step="0.01" value="9.9" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">预览页数(1～20) <span class="text-red-500">*</span></label><input type="number" min="1" max="20" value="3" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg"><option>草稿</option><option>已上架</option><option>已下架</option></select></div>
+      </div>
+      <div class="sticky bottom-0 p-6 bg-white border-t border-gray-200 flex justify-end gap-3">
+        <button type="button" onclick="closeDocEditDrawer()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">取消</button>
+        <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 事业编岗位编辑抽屉 -->
+  <div id="drawer-civil-edit" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeCivilEditDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-800">事业编岗位 - 新增/编辑</h3>
+        <button type="button" onclick="closeCivilEditDrawer()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-6">
+        <div class="rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">基础信息</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2"><label class="block text-sm text-slate-600 mb-1">公告标题 <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">省份</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">区域</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div class="col-span-2"><label class="block text-sm text-slate-600 mb-1">类型 <span class="text-red-500">*</span></label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg"><option>事业单位</option><option>国企</option><option>公务员</option><option>遴选</option><option>大学生村官</option><option>银行</option><option>教师编</option><option>其他</option></select></div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">时间与人数</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-sm text-slate-600 mb-1">报名开始日期</label><input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">报名截止日期</label><input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">招聘人数</label><input type="number" min="0" class="w-full px-3 py-2 border border-gray-200 rounded-lg" value="0" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">职位数量</label><input type="number" min="0" class="w-full px-3 py-2 border border-gray-200 rounded-lg" value="0" /></div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">详情与要求</h4>
+          <div class="space-y-4">
+            <div><label class="block text-sm text-slate-600 mb-1">公告详情</label><textarea class="w-full px-3 py-2 border border-gray-200 rounded-lg" rows="4"></textarea></div>
+            <div><label class="block text-sm text-slate-600 mb-1">报考学历/年龄要求</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">具体岗位（多行或逗号分隔）</label><textarea class="w-full px-3 py-2 border border-gray-200 rounded-lg" rows="2"></textarea></div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">链接与运营</h4>
+          <div class="space-y-3">
+            <div><label class="block text-sm text-slate-600 mb-1">原文链接</label><input type="url" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">来源标签</label><span class="text-slate-500">人工增加（只读）</span></div>
+            <div><label class="block text-sm text-slate-600 mb-1">上架状态</label><span class="text-slate-500">未上架（只读，通过下方按钮操作）</span></div>
+            <div class="flex items-center gap-2"><input type="checkbox" id="civil_unpublish_lock" class="rounded cursor-pointer" /><label for="civil_unpublish_lock" class="text-sm cursor-pointer">手动锁定</label></div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky bottom-0 p-6 bg-white border-t border-gray-200 flex justify-end gap-3">
+        <button type="button" onclick="closeCivilEditDrawer()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">取消</button>
+        <button type="button" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">仅保存</button>
+        <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">保存并上架</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 测试连接结果弹窗 -->
+  <div id="modal-test-connection" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeTestConnectionModal()"></div>
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-xl shadow-xl p-6">
+      <h3 id="test-connection-title" class="text-lg font-semibold text-slate-800 mb-2">测试连接 - 校招</h3>
+      <div id="test-connection-result" class="py-4 text-sm text-slate-600">正在连接…</div>
+      <div class="flex justify-end"><button type="button" onclick="closeTestConnectionModal()" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">关闭</button></div>
+    </div>
+  </div>
+
+  <!-- 手动同步弹窗 -->
+  <div id="modal-manual-sync" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeManualSyncModal()"></div>
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-xl shadow-xl p-6">
+      <h3 class="text-lg font-semibold text-slate-800 mb-2">手动同步</h3>
+      <p class="text-sm text-slate-500 mb-4">将按当前配置立即执行一次同步，请选择同步范围。</p>
+      <div class="space-y-2 mb-4">
+        <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="sync_scope" value="campus" class="cursor-pointer" /> 校招</label>
+        <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="sync_scope" value="civil" class="cursor-pointer" /> 事业编</label>
+        <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="sync_scope" value="all" checked class="cursor-pointer" /> 全部</label>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeManualSyncModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">取消</button>
+        <button type="button" onclick="confirmManualSync()" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">确认同步</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 延长会员弹窗 -->
+  <div id="modal-extend-member" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeExtendMemberModal()"></div>
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-xl shadow-xl p-6">
+      <h3 id="extend-member-title" class="text-lg font-semibold text-slate-800 mb-4">延长校招会员</h3>
+      <div class="space-y-4 mb-4">
+        <div><label class="block text-sm text-slate-600 mb-1">当前到期日</label><span id="extend-current-expire" class="text-slate-700">2026-03-04</span></div>
+        <div><label class="block text-sm text-slate-600 mb-1">会员类型</label><span id="extend-member-type" class="text-slate-700">校招</span></div>
+        <div><label class="block text-sm text-slate-600 mb-1">延长天数 <span class="text-red-500">*</span></label><input type="number" id="extend-days" min="1" max="3650" value="30" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /><span class="text-xs text-slate-400 ml-2">快捷：</span><button type="button" class="text-xs text-primary hover:underline cursor-pointer" onclick="document.getElementById('extend-days').value=30">30天</button><button type="button" class="text-xs text-primary hover:underline cursor-pointer ml-1" onclick="document.getElementById('extend-days').value=365">365天</button></div>
+        <div><label class="block text-sm text-slate-600 mb-1">延长原因（选填）</label><input type="text" id="extend-reason" placeholder="便于审计" class="w-full px-3 py-2 border border-gray-200 rounded-lg" maxlength="200" /></div>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeExtendMemberModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">取消</button>
+        <button type="button" onclick="confirmExtendMember()" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">确认延长</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 同步任务详情抽屉 -->
+  <div id="drawer-task-detail" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeTaskDetailDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-lg bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-800">同步任务详情</h3>
+        <button type="button" onclick="closeTaskDetailDrawer()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><span class="text-slate-500 text-sm">任务ID</span><p class="font-medium">1001</p></div>
+        <div><span class="text-slate-500 text-sm">数据类型</span><p class="font-medium">校招</p></div>
+        <div><span class="text-slate-500 text-sm">触发方式</span><p class="font-medium">自动</p></div>
+        <div><span class="text-slate-500 text-sm">任务状态</span><p class="font-medium text-green-600">完成</p></div>
+        <div><span class="text-slate-500 text-sm">开始时间</span><p class="font-medium">2025-03-04 10:00</p></div>
+        <div><span class="text-slate-500 text-sm">完成时间</span><p class="font-medium">2025-03-04 10:01</p></div>
+        <div><span class="text-slate-500 text-sm">同步结果</span><p class="font-medium">新增 2 / 更新 5 / 跳过 0 / 失败 0</p></div>
+        <div><span class="text-slate-500 text-sm">失败原因</span><p class="text-sm text-slate-600">—</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理员新增/编辑抽屉 -->
+  <div id="drawer-admin-edit" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeAdminEditDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 id="admin-edit-title" class="text-lg font-semibold text-slate-800">新增管理员</h3>
+        <button type="button" onclick="closeAdminEditDrawer()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-sm text-slate-600 mb-1">用户名 <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="4～32 字符" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">密码 <span class="text-red-500">*</span>（编辑时选填，不填则不修改）</label><input type="password" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="6～32 字符" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">姓名/备注</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div><label class="block text-sm text-slate-600 mb-1">状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg"><option>启用</option><option>禁用</option></select></div>
+      </div>
+      <div class="sticky bottom-0 p-6 bg-white border-t border-gray-200 flex justify-end gap-3">
+        <button type="button" onclick="closeAdminEditDrawer()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">取消</button>
+        <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 订单详情抽屉 -->
+  <div id="drawer-order-detail" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeOrderDetailDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-lg bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-800">订单详情</h3>
+        <button type="button" onclick="closeOrderDetailDrawer()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><span class="text-slate-500 text-sm">订单号</span><p class="font-medium">ORD20250304001</p></div>
+        <div><span class="text-slate-500 text-sm">用户</span><p class="font-medium">用户昵称（可跳转用户）</p></div>
+        <div><span class="text-slate-500 text-sm">商品名称</span><p class="font-medium">校招会员-1年</p></div>
+        <div><span class="text-slate-500 text-sm">商品类型</span><p class="font-medium">会员</p></div>
+        <div><span class="text-slate-500 text-sm">原价 / 实付</span><p class="font-medium">¥99 / ¥99</p></div>
+        <div><span class="text-slate-500 text-sm">支付渠道</span><p class="font-medium">微信</p></div>
+        <div><span class="text-slate-500 text-sm">订单状态</span><p class="font-medium">已支付</p></div>
+        <div><span class="text-slate-500 text-sm">创建时间 / 支付时间</span><p class="font-medium">2025-03-04 10:00 / 2025-03-04 10:00</p></div>
+        <div class="pt-4 border-t border-gray-200"><span class="text-slate-500 text-sm">支付流水</span><div class="mt-2 text-sm">第三方交易号：wx_xxx | 金额 ¥99 | 回调状态：成功 | 支付时间 2025-03-04 10:00</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 字段详情抽屉：编辑字段属性 + 枚举值列表 -->
+  <div id="drawer-dict-field-detail" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30" onclick="closeDictFieldDetailDrawer()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 id="dict-field-detail-title" class="text-lg font-semibold text-slate-800">招聘类型 - 字段详情</h3>
+        <button type="button" onclick="closeDictFieldDetailDrawer()" class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-6">
+        <div class="rounded-xl border border-gray-200 p-4">
+          <h4 class="text-sm font-medium text-slate-700 mb-3">字段属性</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-sm text-slate-600 mb-1">字段名</label><input type="text" id="dict-field-name" class="w-full px-3 py-2 border border-gray-200 rounded-lg" value="招聘类型" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">字段键名</label><input type="text" id="dict-field-key" class="w-full px-3 py-2 border border-gray-200 rounded-lg" value="recruit_type" /></div>
+            <div><label class="block text-sm text-slate-600 mb-1">字段类型</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg"><option>枚举</option><option>数值</option><option>文本</option></select></div>
+            <div><label class="block text-sm text-slate-600 mb-1">必填</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg"><option>是</option><option>否</option></select></div>
+          </div>
+          <p class="text-xs text-slate-400 mt-2">类型为数值时可配置取值范围；后续扩展可支持更多类型。</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-medium text-slate-700">枚举值列表</h4>
+            <button type="button" class="text-sm text-primary hover:underline cursor-pointer">新增枚举值</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200"><tr><th class="text-left py-2 px-3 font-medium text-slate-700">显示名</th><th class="text-left py-2 px-3 font-medium text-slate-700">编码</th><th class="text-left py-2 px-3 font-medium text-slate-700">排序</th><th class="text-left py-2 px-3 font-medium text-slate-700">状态</th><th class="text-left py-2 px-3 font-medium text-slate-700">操作</th></tr></thead>
+              <tbody id="dict-enum-tbody">
+                <tr class="border-b border-gray-100"><td class="py-2 px-3">26届春招</td><td class="py-2 px-3">26_spring</td><td class="py-2 px-3">1</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr>
+                <tr class="border-b border-gray-100"><td class="py-2 px-3">日常实习</td><td class="py-2 px-3">daily_intern</td><td class="py-2 px-3">2</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="sticky bottom-0 p-6 bg-white border-t border-gray-200 flex justify-end gap-3">
+        <button type="button" onclick="closeDictFieldDetailDrawer()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer">关闭</button>
+        <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg cursor-pointer">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(function (el) { el.classList.remove('active'); });
+      var el = document.getElementById('page-' + pageId);
+      if (el) el.classList.add('active');
+      document.querySelectorAll('.menu-item').forEach(function (el) { el.classList.remove('active'); });
+      document.querySelectorAll('.menu-item[data-page="' + pageId + '"]').forEach(function (el) { el.classList.add('active'); });
+    }
+
+    document.querySelectorAll('.menu-item[data-page]').forEach(function (el) {
+      el.addEventListener('click', function () { showPage(this.getAttribute('data-page')); });
+    });
+
+    function showCampusEdit() {
+      document.getElementById('drawer-campus-edit').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeCampusEdit() {
+      document.getElementById('drawer-campus-edit').classList.add('hidden');
+    }
+
+    function logout() {
+      if (confirm('确定退出登录？')) window.location.href = 'login.html';
+    }
+
+    function showFeishuConfigDrawer(type) {
+      document.getElementById('drawer-feishu-config').classList.remove('hidden');
+      document.getElementById('feishu-config-title').textContent = type === 'campus' ? '编辑配置 - 校招' : '编辑配置 - 事业编';
+      lucide.createIcons();
+    }
+    function closeFeishuConfigDrawer() {
+      document.getElementById('drawer-feishu-config').classList.add('hidden');
+    }
+
+    function showDocEditDrawer() {
+      document.getElementById('drawer-doc-edit').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeDocEditDrawer() {
+      document.getElementById('drawer-doc-edit').classList.add('hidden');
+    }
+
+    function showCivilEditDrawer() {
+      document.getElementById('drawer-civil-edit').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeCivilEditDrawer() {
+      document.getElementById('drawer-civil-edit').classList.add('hidden');
+    }
+
+    function showTestConnectionModal(type) {
+      var modal = document.getElementById('modal-test-connection');
+      document.getElementById('test-connection-title').textContent = '测试连接 - ' + type;
+      document.getElementById('test-connection-result').textContent = '正在连接…';
+      modal.classList.remove('hidden');
+      setTimeout(function() { document.getElementById('test-connection-result').innerHTML = '<span class="text-green-600">连接成功</span><br>已成功读取飞书表格'; }, 800);
+    }
+    function closeTestConnectionModal() {
+      document.getElementById('modal-test-connection').classList.add('hidden');
+    }
+
+    function showManualSyncModal() {
+      document.getElementById('modal-manual-sync').classList.remove('hidden');
+    }
+    function closeManualSyncModal() {
+      document.getElementById('modal-manual-sync').classList.add('hidden');
+    }
+    function confirmManualSync() {
+      closeManualSyncModal();
+      alert('已创建同步任务，请到【任务】页查看进度');
+    }
+
+    function showExtendMemberModal(type) {
+      var title = document.getElementById('extend-member-title');
+      var typeEl = document.getElementById('extend-member-type');
+      if (type === 'campus') { title.textContent = '延长校招会员'; typeEl.textContent = '校招'; document.getElementById('extend-current-expire').textContent = '2026-03-04'; }
+      else { title.textContent = '延长事业编会员'; typeEl.textContent = '事业编'; document.getElementById('extend-current-expire').textContent = '— 或 2025-12-31'; }
+      document.getElementById('modal-extend-member').classList.remove('hidden');
+    }
+    function closeExtendMemberModal() {
+      document.getElementById('modal-extend-member').classList.add('hidden');
+    }
+    function confirmExtendMember() {
+      closeExtendMemberModal();
+      alert('延长成功');
+    }
+
+    function showTaskDetailDrawer() {
+      document.getElementById('drawer-task-detail').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeTaskDetailDrawer() {
+      document.getElementById('drawer-task-detail').classList.add('hidden');
+    }
+
+    function showAdminEditDrawer(isNew) {
+      document.getElementById('drawer-admin-edit').classList.remove('hidden');
+      document.getElementById('admin-edit-title').textContent = isNew ? '新增管理员' : '编辑管理员';
+      lucide.createIcons();
+    }
+    function closeAdminEditDrawer() {
+      document.getElementById('drawer-admin-edit').classList.add('hidden');
+    }
+
+    function showOrderDetailDrawer() {
+      document.getElementById('drawer-order-detail').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeOrderDetailDrawer() {
+      document.getElementById('drawer-order-detail').classList.add('hidden');
+    }
+
+    function switchDictTab(tab) {
+      document.getElementById('dict-panel-campus').classList.toggle('hidden', tab !== 'campus');
+      document.getElementById('dict-panel-civil').classList.toggle('hidden', tab !== 'civil');
+      document.getElementById('dict-tab-campus').className = tab === 'campus' ? 'dict-tab px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary cursor-pointer' : 'dict-tab px-4 py-2 text-sm text-slate-500 cursor-pointer hover:text-slate-700';
+      document.getElementById('dict-tab-civil').className = tab === 'civil' ? 'dict-tab px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary cursor-pointer' : 'dict-tab px-4 py-2 text-sm text-slate-500 cursor-pointer hover:text-slate-700';
+    }
+    function showDictFieldDetailDrawer(fieldName, fieldKey) {
+      var drawer = document.getElementById('drawer-dict-field-detail');
+      document.getElementById('dict-field-detail-title').textContent = fieldName + ' - 字段详情';
+      document.getElementById('dict-field-name').value = fieldName;
+      document.getElementById('dict-field-key').value = fieldKey;
+      var tbody = document.getElementById('dict-enum-tbody');
+      if (fieldKey === 'recruit_type') {
+        tbody.innerHTML = '<tr class="border-b border-gray-100"><td class="py-2 px-3">26届春招</td><td class="py-2 px-3">26_spring</td><td class="py-2 px-3">1</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr><tr class="border-b border-gray-100"><td class="py-2 px-3">日常实习</td><td class="py-2 px-3">daily_intern</td><td class="py-2 px-3">2</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr>';
+      } else if (fieldKey === 'industry') {
+        tbody.innerHTML = '<tr class="border-b border-gray-100"><td class="py-2 px-3">金融业</td><td class="py-2 px-3">finance</td><td class="py-2 px-3">1</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr><tr class="border-b border-gray-100"><td class="py-2 px-3">IT互联网</td><td class="py-2 px-3">it</td><td class="py-2 px-3">2</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr>';
+      } else {
+        tbody.innerHTML = '<tr class="border-b border-gray-100"><td class="py-2 px-3">事业单位</td><td class="py-2 px-3">institution</td><td class="py-2 px-3">1</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr><tr class="border-b border-gray-100"><td class="py-2 px-3">国企</td><td class="py-2 px-3">soe</td><td class="py-2 px-3">2</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr><tr class="border-b border-gray-100"><td class="py-2 px-3">公务员</td><td class="py-2 px-3">civil_servant</td><td class="py-2 px-3">3</td><td class="py-2 px-3">启用</td><td class="py-2 px-3"><button type="button" class="text-primary hover:underline cursor-pointer">编辑</button></td></tr>';
+      }
+      drawer.classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeDictFieldDetailDrawer() {
+      document.getElementById('drawer-dict-field-detail').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

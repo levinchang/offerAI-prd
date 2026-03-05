@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    participant U as 用户
+    participant FE as 前端Web
+    participant BE as 后端API
+    participant DB as 数据库
+
+    U->>FE: 打开事业编/国企信息表页面
+    FE->>BE: 请求公告列表(携带筛选条件&token)
+    BE->>DB: 查询事业编岗位列表
+    BE-->>FE: 返回列表(含公告标题/省份/区域/类型/报名时间/人数等)
+    FE-->>U: 渲染公告列表(含【查看详情】/【原文链接】按钮)
+
+    %% 查看公告详情（对登录用户均可）
+    U->>FE: 点击【查看详情】
+    FE->>BE: 请求公告详情(公告ID)
+    BE->>DB: 查询公告详情(公告详情/报考要求/岗位列表等)
+    BE-->>FE: 返回完整详情
+    FE-->>U: 展示公告详情弹层或详情页
+
+    %% 点击原文链接时的会员判断
+    U->>FE: 在详情中点击【原文链接】
+    alt 非事业编会员
+        FE-->>U: 弹出会员权益弹窗(提示开通事业编会员)
+    else 事业编会员
+        FE->>BE: 上报点击原文链接
+        BE->>DB: 可选：写入投递记录(来源=civil,阶段=已报名)
+        BE-->>FE: 返回成功
+        FE-->>U: 在新标签页打开原文链接(浏览器跳转真实URL)
+    end

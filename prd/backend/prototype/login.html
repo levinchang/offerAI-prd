@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理员登录 - Offer信息站 管理后台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#7C3AED', 600: '#6D28D9', 700: '#5B21B6' },
+            surface: '#FAF5FF',
+            ink: '#4C1D95',
+          },
+          fontFamily: {
+            sans: ['Fira Sans', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Fira Sans', sans-serif; }
+    .transition-default { transition: color 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s; }
+  </style>
+</head>
+<body class="min-h-screen bg-surface flex flex-col items-center justify-center text-slate-800 px-4">
+  <div class="w-full max-w-md">
+    <!-- 系统名称 -->
+    <h1 class="text-2xl font-semibold text-ink text-center mb-8 font-mono">
+      Offer信息站 - 管理后台
+    </h1>
+
+    <!-- 登录卡片 -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label for="username" class="block text-sm font-medium text-slate-700 mb-1.5">
+            账号 <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="4～32 字符，字母数字下划线"
+            maxlength="32"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-default"
+            required
+          />
+          <p id="usernameError" class="mt-1 text-sm text-red-500 hidden">请输入账号；账号长度为 4～32 个字符</p>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-slate-700 mb-1.5">
+            密码 <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="6～32 字符"
+            maxlength="32"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-default"
+            required
+          />
+          <p id="passwordError" class="mt-1 text-sm text-red-500 hidden">请输入密码；密码长度为 6～32 个字符</p>
+        </div>
+
+        <div class="flex items-center">
+          <input type="checkbox" id="remember" name="remember" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer" />
+          <label for="remember" class="ml-2 text-sm text-slate-600 cursor-pointer">记住账号</label>
+        </div>
+
+        <p id="formError" class="text-sm text-red-500 hidden"></p>
+
+        <button
+          type="submit"
+          id="submitBtn"
+          class="w-full py-2.5 bg-primary hover:bg-primary-600 text-white font-medium rounded-lg cursor-pointer transition-default focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          登录
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-slate-500 text-sm mt-6">仅授权管理员可访问</p>
+    <p class="text-center text-slate-400 text-xs mt-2">默认超级管理员：Admin / admin1234</p>
+  </div>
+
+  <script>
+    (function () {
+      var form = document.getElementById('loginForm');
+      var username = document.getElementById('username');
+      var password = document.getElementById('password');
+      var usernameError = document.getElementById('usernameError');
+      var passwordError = document.getElementById('passwordError');
+      var formError = document.getElementById('formError');
+      var submitBtn = document.getElementById('submitBtn');
+
+      function showError(el, show) {
+        el.classList.toggle('hidden', !show);
+      }
+
+      function validate() {
+        var ok = true;
+        var u = (username.value || '').trim();
+        var p = password.value || '';
+
+        showError(usernameError, false);
+        showError(passwordError, false);
+        showError(formError, false);
+
+        if (u.length === 0) {
+          usernameError.textContent = '请输入账号';
+          showError(usernameError, true);
+          ok = false;
+        } else if (u.length < 4 || u.length > 32) {
+          usernameError.textContent = '账号长度为 4～32 个字符';
+          showError(usernameError, true);
+          ok = false;
+        }
+        if (p.length === 0) {
+          passwordError.textContent = '请输入密码';
+          showError(passwordError, true);
+          ok = false;
+        } else if (p.length < 6 || p.length > 32) {
+          passwordError.textContent = '密码长度为 6～32 个字符';
+          showError(passwordError, true);
+          ok = false;
+        }
+        return ok;
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!validate()) return;
+
+        submitBtn.disabled = true;
+        // 原型：模拟登录成功，跳转后台
+        setTimeout(function () {
+          window.location.href = 'index.html';
+        }, 400);
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Offer信息站 - 校招信息表原型</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CDN，用于快速排版 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#E63946',
+            accent: '#1D3557',
+            accentLight: '#457B9D',
+          },
+          fontFamily: {
+            sans: ['system-ui', 'PingFang SC', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .nav-item { cursor: pointer; padding: 0.75rem 1rem; border-bottom: 2px solid transparent; }
+    .nav-item.active { color: #E63946; border-color: #E63946; font-weight: 600; }
+    .btn-primary { background-color: #E63946; color: white; }
+    .btn-primary:hover { background-color: #c42d3a; }
+    .btn-outline { border: 1px solid #e2e8f0; color: #1e293b; }
+    .btn-outline:hover { border-color: #E63946; color: #E63946; }
+  </style>
+
+  <!-- 先定义 showPage，保证导航 onclick 总是可用 -->
+  <script>
+    function showPage(id) {
+      var pages = document.querySelectorAll('.page');
+      for (var i = 0; i < pages.length; i++) {
+        pages[i].classList.remove('active');
+      }
+      var page = document.getElementById('page-' + id);
+      if (page) page.classList.add('active');
+
+      var navItems = document.querySelectorAll('.nav-item');
+      for (var j = 0; j < navItems.length; j++) {
+        var item = navItems[j];
+        item.classList.toggle('active', item.getAttribute('data-page') === id);
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800">
+
+  <!-- 顶部导航 -->
+  <header class="sticky top-0 z-20 bg-white/90 border-b border-slate-200 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
+      <div class="flex items-center gap-8">
+        <div class="font-semibold text-lg text-accent cursor-pointer" onclick="showPage('home')">
+          Offer信息站
+        </div>
+        <nav class="hidden md:flex items-center text-sm text-slate-600">
+          <span class="nav-item active" data-page="home" onclick="showPage('home')">首页</span>
+          <span class="nav-item" data-page="campus" onclick="showPage('campus')">校招信息表</span>
+        </nav>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="button" class="btn-outline px-3 py-1.5 rounded-full text-xs">官方小程序</button>
+        <button type="button" id="btnLogin" class="btn-primary px-4 py-1.5 rounded-full text-xs font-medium">
+          求职者登录
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+
+    <!-- 首页简版 -->
+    <section id="page-home" class="page active">
+      <h1 class="text-2xl font-semibold mb-4 mt-2">首页（示意）</h1>
+      <p class="text-sm text-slate-600 mb-6">
+        点击顶部「校招信息表」查看完整的校招页面原型。
+      </p>
+      <button class="btn-primary px-4 py-2 rounded-lg text-sm" onclick="showPage('campus')">
+        进入校招信息表
+      </button>
+    </section>
+
+    <!-- 校招信息表页面 -->
+    <section id="page-campus" class="page">
+      <!-- 统计区 -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-4 mt-2">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div class="font-semibold text-slate-800 text-sm">24h 校招求职会员信息动态</div>
+          <div class="text-xs text-slate-400">最近更新：2026-02-25</div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center text-xs">
+          <div>
+            <div class="text-xl font-bold text-primary">32</div>
+            <div class="text-slate-500 mt-1">24h 内新增</div>
+          </div>
+          <div>
+            <div class="text-xl font-bold text-amber-500">4</div>
+            <div class="text-slate-500 mt-1">今日截止</div>
+          </div>
+          <div>
+            <div class="text-xl font-bold text-accent">182</div>
+            <div class="text-slate-500 mt-1">7 日内更新</div>
+          </div>
+          <div>
+            <div class="text-xl font-bold text-accentLight">673</div>
+            <div class="text-slate-500 mt-1">30 日内更新</div>
+          </div>
+          <div>
+            <div class="text-xl font-bold text-emerald-600">3,880</div>
+            <div class="text-slate-500 mt-1">日常实习岗位</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 会员引导条 -->
+      <div id="campus-banner"
+           class="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <span id="campus-banner-text" class="text-rose-800">
+          当前为未登录访客，仅可浏览基础信息；登录并开通校招会员后可解锁投递链接、投递看板与简历库。
+        </span>
+        <button id="campus-banner-btn"
+                class="btn-primary px-3 py-1.5 rounded-full text-[11px] font-medium">
+          登录并开通校招会员
+        </button>
+      </div>
+
+      <!-- 搜索 + 标签筛选 -->
+      <div class="mb-3">
+        <input
+          class="w-full max-w-xl border border-slate-200 rounded-full px-4 py-2.5 text-sm"
+          placeholder="搜索职位、公司，31679 家企业校招已更新" />
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-3 text-xs">
+        <button class="px-3 py-1 rounded-full bg-primary text-white">全部</button>
+        <button class="px-3 py-1 rounded-full border border-slate-200 bg-white text-slate-700">
+          26届秋招
+        </button>
+        <button class="px-3 py-1 rounded-full border border-slate-200 bg-white text-slate-700">
+          日常实习
+        </button>
+      </div>
+
+      <!-- 其他筛选 -->
+      <div class="flex flex-wrap gap-2 mb-3 text-xs">
+        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700">
+          城市：全国 / 北上广深杭
+        </button>
+        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700">
+          企业类型 / 岗位类型 / 网申时间…
+        </button>
+        <button class="btn-outline px-3 py-1.5 rounded-lg text-xs ml-auto">
+          重置
+        </button>
+      </div>
+
+      <!-- 我的筛选分组（示意） -->
+      <div class="flex flex-wrap items-center gap-2 mb-4 text-xs text-slate-600">
+        <span class="font-medium">我的筛选分组：</span>
+        <button class="px-2 py-1 rounded-full border border-slate-200 bg-white">默认</button>
+        <button class="px-2 py-1 rounded-full border border-slate-200 bg-white">冲刺岗位</button>
+        <button class="px-2 py-1 rounded-full border border-slate-200 bg-white">保底岗位</button>
+        <button class="btn-outline px-3 py-1.5 rounded-full text-[11px] font-medium ml-auto">
+          保存当前筛选
+        </button>
+      </div>
+
+      <!-- 列表表格 -->
+      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden text-xs">
+        <table class="w-full min-w-[900px]">
+          <thead class="bg-slate-50 border-b border-slate-200 text-slate-700">
+            <tr>
+              <th class="py-2 px-3 text-left">更新时间</th>
+              <th class="py-2 px-3 text-left">公司名称</th>
+              <th class="py-2 px-3 text-left">投递岗位</th>
+              <th class="py-2 px-3 text-left">工作城市</th>
+              <th class="py-2 px-3 text-left">网申时间</th>
+              <th class="py-2 px-3 text-left">毕业生要求</th>
+              <th class="py-2 px-3 text-left">浏览量</th>
+              <th class="py-2 px-3 text-left">信息来源</th>
+              <th class="py-2 px-3 text-left">投递链接</th>
+              <th class="py-2 px-3 text-left">会员操作</th>
+            </tr>
+          </thead>
+          <tbody class="text-slate-700">
+            <tr class="border-b border-slate-100 hover:bg-slate-50">
+              <td class="py-2.5 px-3">2026.02.25</td>
+              <td class="py-2.5 px-3">事业单位 · 某省某单位</td>
+              <td class="py-2.5 px-3">
+                产品经理
+              </td>
+              <td class="py-2.5 px-3">合肥市</td>
+              <td class="py-2.5 px-3">2026-02-24 至 2026-11-30</td>
+              <td class="py-2.5 px-3">国内：博士及以上 / 26</td>
+              <td class="py-2.5 px-3">290</td>
+              <td class="py-2.5 px-3">官方公众号</td>
+              <td class="py-2.5 px-3">
+                <a href="#" data-action="campus-apply"
+                   class="text-primary underline-offset-2">登录后可查看 🔒</a>
+              </td>
+              <td class="py-2.5 px-3 js-campus-ops">
+                <select class="border border-slate-200 rounded px-2 py-1 text-[11px] mr-1">
+                  <option>暂无</option>
+                  <option>已投递</option>
+                  <option>笔试</option>
+                </select>
+                <button class="btn-outline px-2 py-1 rounded text-[11px] mr-1">编辑备注</button>
+                <button class="btn-outline px-2 py-1 rounded text-[11px]">公告原文</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-3 text-[11px] text-slate-500">共 1 条，当前第 1 页（示意）</p>
+    </section>
+  </main>
+
+  <!-- 登录弹窗 -->
+  <div id="modal-login"
+       class="fixed inset-0 bg-black/50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl p-6 w-[320px] text-center shadow-lg">
+      <div class="font-semibold text-slate-800 mb-2 text-base">微信一扫，立即登录</div>
+      <p class="text-xs text-slate-500 mb-3">关注公众号后自动完成登录与注册</p>
+      <div class="w-40 h-40 mx-auto mb-3 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 text-xs">
+        二维码占位
+      </div>
+      <p class="text-[11px] text-slate-500 mb-3">
+        请使用微信扫描二维码，关注「Offer信息站」公众号后返回本页。
+      </p>
+      <p class="text-[10px] text-rose-500 mb-4">
+        登录即代表同意《用户协议》和《隐私政策》
+      </p>
+      <div class="flex gap-2">
+        <button class="btn-outline flex-1 py-1.5 rounded-lg text-xs"
+                onclick="closeModal('modal-login')">关闭</button>
+        <button class="btn-primary flex-1 py-1.5 rounded-lg text-xs"
+                onclick="simulateLoginSuccess()">模拟扫码成功</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 权益弹窗 -->
+  <div id="modal-paywall"
+       class="fixed inset-0 bg-black/50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl p-6 w-[340px] shadow-lg text-sm">
+      <div class="font-semibold text-slate-800 mb-2">开通校招会员解锁投递链接</div>
+      <p class="text-slate-500 mb-4">
+        会员可查看投递链接 / 原文链接，并使用投递看板与简历库管理投递进度。
+      </p>
+      <div class="flex justify-end gap-2">
+        <button class="btn-outline px-3 py-1.5 rounded-lg text-xs"
+                onclick="closeModal('modal-paywall')">稍后再说</button>
+        <button class="btn-primary px-3 py-1.5 rounded-lg text-xs"
+                onclick="closeModal('modal-paywall'); showPage('home'); alert('跳转到会员开通页（示意）');">
+          19.9/年 立即开通
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 状态模拟：登录 + 校招会员
+    var isLoggedIn = false;
+    var hasCampusMember = false;
+
+    function openLogin() {
+      document.getElementById('modal-login').classList.remove('hidden');
+      document.getElementById('modal-login').classList.add('flex');
+    }
+
+    function simulateLoginSuccess() {
+      isLoggedIn = true;
+      closeModal('modal-login');
+      updateCampusUI();
+    }
+
+    function openPaywall() {
+      document.getElementById('modal-paywall').classList.remove('hidden');
+      document.getElementById('modal-paywall').classList.add('flex');
+    }
+
+    function closeModal(id) {
+      var m = document.getElementById(id);
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    // 校招页三种状态 UI
+    function updateCampusUI() {
+      var btnLogin = document.getElementById('btnLogin');
+      if (isLoggedIn) {
+        btnLogin.textContent = hasCampusMember ? '校招会员（模拟）' : '已登录（模拟）';
+      } else {
+        btnLogin.textContent = '求职者登录';
+      }
+
+      // 引导条文案
+      var banner = document.getElementById('campus-banner');
+      var text = document.getElementById('campus-banner-text');
+      var btn = document.getElementById('campus-banner-btn');
+      if (!isLoggedIn) {
+        banner.classList.remove('hidden');
+        text.textContent = '当前为未登录访客，仅可浏览基础信息；登录并开通校招会员后可解锁投递链接、投递看板与简历库。';
+        btn.textContent = '登录并开通校招会员';
+      } else if (isLoggedIn && !hasCampusMember) {
+        banner.classList.remove('hidden');
+        text.textContent = '已登录，尚未开通校招会员：开通后可解锁投递链接与原文链接，并使用投递看板。';
+        btn.textContent = '开通校招会员';
+      } else {
+        // 已是校招会员，可以隐藏或改为弱提示
+        banner.classList.add('hidden');
+      }
+
+      // 列表里投递链接文案 + 会员操作区是否可用
+      var applyLinks = document.querySelectorAll('[data-action="campus-apply"]');
+      var opsCells = document.querySelectorAll('.js-campus-ops');
+
+      applyLinks.forEach(function (a) {
+        if (!isLoggedIn) a.textContent = '登录后可查看 🔒';
+        else if (!hasCampusMember) a.textContent = '开通会员解锁 🔒';
+        else a.textContent = '点击投递';
+      });
+
+      opsCells.forEach(function (cell) {
+        var ctrls = cell.querySelectorAll('button, select');
+        ctrls.forEach(function (c) {
+          if (!isLoggedIn || !hasCampusMember) {
+            c.disabled = true;
+            c.classList.add('opacity-50', 'cursor-not-allowed');
+          } else {
+            c.disabled = false;
+            c.classList.remove('opacity-50', 'cursor-not-allowed');
+          }
+        });
+      });
+    }
+
+    // 交互绑定
+    document.getElementById('btnLogin').addEventListener('click', function () {
+      if (!isLoggedIn) openLogin();
+      else alert('已登录（模拟），这里可跳到个人中心。');
+    });
+
+    document.getElementById('campus-banner-btn').addEventListener('click', function () {
+      if (!isLoggedIn) openLogin();
+      else if (!hasCampusMember) openPaywall();
+    });
+
+    document.querySelectorAll('[data-action="campus-apply"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!isLoggedIn) openLogin();
+        else if (!hasCampusMember) openPaywall();
+        else alert('模拟：写入投递记录并打开投递链接');
+      });
+    });
+
+    // 初始渲染
+    updateCampusUI();
+  </script>
+</body>
+</html>

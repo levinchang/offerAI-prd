@@ -1,0 +1,28 @@
+sequenceDiagram
+    autonumber
+    participant U as 用户
+    participant FE as 前端Web
+    participant BE as 后端API
+    participant DB as 数据库
+
+    U->>FE: 打开校招信息表页面
+    FE->>BE: 请求岗位列表(携带筛选条件&用户token)
+    BE->>DB: 查询校招岗位列表
+    BE->>BE: 根据用户是否为校招会员组装返回字段
+    alt 非校招会员
+        BE-->>FE: 返回岗位列表(投递链接/原文链接 locked=true,url=null)
+    else 校招会员
+        BE-->>FE: 返回岗位列表(包含真实投递链接/原文链接)
+    end
+    FE-->>U: 渲染列表(投递按钮/原文链接)
+
+    %% 点击投递入口时的分支
+    U->>FE: 点击【投递】按钮
+    alt 非校招会员
+        FE-->>U: 弹出会员权益弹窗(展示19.9元/年等)
+    else 校招会员
+        FE->>BE: 上报点击投递(用于写入投递记录)
+        BE->>DB: 创建/更新投递记录(来源=campus,阶段=已投递)
+        BE-->>FE: 返回成功
+        FE-->>U: 在新标签页打开投递链接(浏览器直接跳转真实URL)
+    end
