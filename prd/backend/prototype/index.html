@@ -74,6 +74,9 @@
           <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="order-list">
             <span class="inline-flex items-center gap-2"><i data-lucide="shopping-cart" class="w-4 h-4"></i>订单列表</span>
           </div>
+          <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="sku-list">
+            <span class="inline-flex items-center gap-2"><i data-lucide="tags" class="w-4 h-4"></i>会员商品与定价</span>
+          </div>
           <div class="menu-item px-4 py-2.5 text-sm text-slate-700 rounded-r-lg" data-page="member-list">
             <span class="inline-flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i>会员列表</span>
           </div>
@@ -410,12 +413,14 @@
             <button type="button" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-600 cursor-pointer transition-default" onclick="showDocEditDrawer()">新增资料</button>
           </div>
           <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div><label class="block text-xs text-slate-500 mb-1">标题</label><input type="text" placeholder="模糊" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-              <div><label class="block text-xs text-slate-500 mb-1">行业</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">行业</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>互联网</option><option>金融</option><option>制造业</option><option>事业单位</option></select></div>
+              <div><label class="block text-xs text-slate-500 mb-1">岗位</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>产品</option><option>运营</option><option>开发</option><option>财务</option></select></div>
               <div><label class="block text-xs text-slate-500 mb-1">状态</label><select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"><option>全部</option><option>草稿</option><option>已上架</option><option>已下架</option></select></div>
-              <div class="flex items-end gap-2"><button type="button" class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 cursor-pointer">搜索</button></div>
+              <div class="flex items-end gap-2"><button type="button" class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 cursor-pointer">重置</button><button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm cursor-pointer">搜索</button></div>
             </div>
+            <p class="mt-2 text-xs text-slate-400">行业与岗位选项来自字典或资料分类配置；前台「资料商城」的筛选项与此保持一致。</p>
           </div>
           <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
             <table class="w-full text-sm">
@@ -424,6 +429,7 @@
                   <th class="text-left py-3 px-4 font-medium text-slate-700">资料ID</th>
                   <th class="text-left py-3 px-4 font-medium text-slate-700">标题</th>
                   <th class="text-left py-3 px-4 font-medium text-slate-700">行业</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">岗位</th>
                   <th class="text-left py-3 px-4 font-medium text-slate-700">价格</th>
                   <th class="text-left py-3 px-4 font-medium text-slate-700">预览页数</th>
                   <th class="text-left py-3 px-4 font-medium text-slate-700">状态</th>
@@ -432,7 +438,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr class="border-b border-gray-100"><td class="py-3 px-4">3001</td><td class="py-3 px-4">互联网大厂面经</td><td class="py-3 px-4">IT</td><td class="py-3 px-4">¥9.9</td><td class="py-3 px-4">3</td><td class="py-3 px-4">已上架</td><td class="py-3 px-4">128</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showDocEditDrawer()">编辑</button><button type="button" class="text-primary hover:underline cursor-pointer">下架</button></td></tr>
+                <tr class="border-b border-gray-100"><td class="py-3 px-4">3001</td><td class="py-3 px-4">互联网大厂面经</td><td class="py-3 px-4">IT互联网</td><td class="py-3 px-4">产品</td><td class="py-3 px-4">¥9.9</td><td class="py-3 px-4">3</td><td class="py-3 px-4">已上架</td><td class="py-3 px-4">128</td><td class="py-3 px-4"><button type="button" class="text-primary hover:underline cursor-pointer mr-2" onclick="showDocEditDrawer()">编辑</button><button type="button" class="text-primary hover:underline cursor-pointer">下架</button></td></tr>
               </tbody>
             </table>
           </div>
@@ -472,6 +478,77 @@
             </table>
           </div>
           <div class="mt-4 text-sm text-slate-500">共 1 条</div>
+        </section>
+
+        <!-- 会员商品与定价（SKU 配置） -->
+        <section id="page-sku-list" class="page">
+          <h2 class="text-xl font-semibold text-slate-800 mb-4">会员商品与定价</h2>
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4 flex items-center justify-between">
+            <div class="text-sm text-slate-600">用于配置校招会员、事业编会员、双会员等 SKU 的价格与有效期，前台套餐页与收银台价格均以此为准。</div>
+            <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg text-sm cursor-pointer">新增SKU</button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">SKU ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">名称</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">类型</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">有效期(天)</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">原价</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">促销价</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">是否展示</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4">SKU_CAMPUS_YEAR</td>
+                  <td class="py-3 px-4">校招会员-1年</td>
+                  <td class="py-3 px-4">校招</td>
+                  <td class="py-3 px-4">365</td>
+                  <td class="py-3 px-4">¥19.9</td>
+                  <td class="py-3 px-4">—</td>
+                  <td class="py-3 px-4">是</td>
+                  <td class="py-3 px-4">上架</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer">下架</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4">SKU_CIVIL_YEAR</td>
+                  <td class="py-3 px-4">事业编会员-1年</td>
+                  <td class="py-3 px-4">事业编</td>
+                  <td class="py-3 px-4">365</td>
+                  <td class="py-3 px-4">¥19.9</td>
+                  <td class="py-3 px-4">—</td>
+                  <td class="py-3 px-4">是</td>
+                  <td class="py-3 px-4">上架</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer">下架</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-4">SKU_ALL_YEAR</td>
+                  <td class="py-3 px-4">双会员-1年</td>
+                  <td class="py-3 px-4">全站</td>
+                  <td class="py-3 px-4">365</td>
+                  <td class="py-3 px-4">¥29.9</td>
+                  <td class="py-3 px-4">¥24.9</td>
+                  <td class="py-3 px-4">是</td>
+                  <td class="py-3 px-4">上架</td>
+                  <td class="py-3 px-4">
+                    <button type="button" class="text-primary hover:underline cursor-pointer mr-2">编辑</button>
+                    <button type="button" class="text-primary hover:underline cursor-pointer">下架</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 text-sm text-slate-500">共 3 条</div>
         </section>
 
         <!-- 会员列表 -->
@@ -729,7 +806,28 @@
         </div>
         <div><label class="block text-sm text-slate-600 mb-1">标题 <span class="text-red-500">*</span></label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
         <div><label class="block text-sm text-slate-600 mb-1">简介</label><textarea class="w-full px-3 py-2 border border-gray-200 rounded-lg" rows="3"></textarea></div>
-        <div><label class="block text-sm text-slate-600 mb-1">行业</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
+        <div>
+          <label class="block text-sm text-slate-600 mb-1">行业</label>
+          <select class="w-full px-3 py-2 border border-gray-200 rounded-lg">
+            <option>请选择行业</option>
+            <option>IT互联网</option>
+            <option>金融业</option>
+            <option>制造业</option>
+            <option>事业单位</option>
+          </select>
+          <p class="mt-1 text-xs text-slate-400">选项来自「字典管理-行业」，前台资料商城行业筛选与此保持一致。</p>
+        </div>
+        <div>
+          <label class="block text-sm text-slate-600 mb-1">岗位（可多选）</label>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="px-3 py-1 rounded-full border border-gray-200 text-xs cursor-pointer hover:bg-gray-50">产品</button>
+            <button type="button" class="px-3 py-1 rounded-full border border-gray-200 text-xs cursor-pointer hover:bg-gray-50">运营</button>
+            <button type="button" class="px-3 py-1 rounded-full border border-gray-200 text-xs cursor-pointer hover:bg-gray-50">开发</button>
+            <button type="button" class="px-3 py-1 rounded-full border border-gray-200 text-xs cursor-pointer hover:bg-gray-50">测试</button>
+            <button type="button" class="px-3 py-1 rounded-full border border-dashed border-gray-300 text-xs cursor-pointer hover:bg-gray-50">+ 自定义</button>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">岗位列表来自岗位字典；前台资料商城的岗位筛选项为所有已启用岗位的聚合。</p>
+        </div>
         <div><label class="block text-sm text-slate-600 mb-1">企业标签（逗号分隔）</label><input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="腾讯,字节" /></div>
         <div><label class="block text-sm text-slate-600 mb-1">价格(元) <span class="text-red-500">*</span></label><input type="number" min="0" step="0.01" value="9.9" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>
         <div><label class="block text-sm text-slate-600 mb-1">预览页数(1～20) <span class="text-red-500">*</span></label><input type="number" min="1" max="20" value="3" class="w-full px-3 py-2 border border-gray-200 rounded-lg" /></div>

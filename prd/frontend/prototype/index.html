@@ -2,370 +2,2160 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>Offer信息站 - 校招信息表原型</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Tailwind CDN，用于快速排版 -->
+  <title>Offer信息站 - 24h 校招与事业编信息刷新</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            primary: '#E63946',
-            accent: '#1D3557',
-            accentLight: '#457B9D',
+            primary: { DEFAULT: '#E63946', 600: '#c42d3a', 700: '#a12530' },
+            accent: { DEFAULT: '#1D3557', light: '#457B9D' },
+            surface: { DEFAULT: '#F8FAFC', card: '#FFFFFF' },
           },
-          fontFamily: {
-            sans: ['system-ui', 'PingFang SC', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] },
+          boxShadow: {
+            card: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)',
+            'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06)',
           },
         },
       },
     };
   </script>
   <style>
-    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
+    body { font-family: 'DM Sans', system-ui, sans-serif; }
+    .transition-default { transition: color 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
     .page { display: none; }
-    .page.active { display: block; }
-    .nav-item { cursor: pointer; padding: 0.75rem 1rem; border-bottom: 2px solid transparent; }
-    .nav-item.active { color: #E63946; border-color: #E63946; font-weight: 600; }
-    .btn-primary { background-color: #E63946; color: white; }
-    .btn-primary:hover { background-color: #c42d3a; }
+    .page.active { display: block; animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .nav-item { cursor: pointer; padding: 0.75rem 1rem; color: #475569; border-bottom: 2px solid transparent; }
+    .nav-item:hover { color: #E63946; }
+    .nav-item.active { color: #E63946; font-weight: 600; border-bottom-color: #E63946; }
+    .stat-card { cursor: default; }
+    .stat-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08); transform: translateY(-1px); }
+    .feature-card { cursor: pointer; }
+    .feature-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08); border-color: #E63946; }
+    .btn-primary { background: #E63946; color: #fff; }
+    .btn-primary:hover { background: #c42d3a; }
     .btn-outline { border: 1px solid #e2e8f0; color: #1e293b; }
     .btn-outline:hover { border-color: #E63946; color: #E63946; }
+    input:focus, select:focus { outline: none; border-color: #457B9D; }
+    .nav-tab.active { border-color: #457B9D; color: #457B9D; }
+    .filter-pill.active { border-color: #E63946; background: rgba(230, 57, 70, 0.1); color: #E63946; }
   </style>
-
-  <!-- 先定义 showPage，保证导航 onclick 总是可用 -->
-  <script>
-    function showPage(id) {
-      var pages = document.querySelectorAll('.page');
-      for (var i = 0; i < pages.length; i++) {
-        pages[i].classList.remove('active');
-      }
-      var page = document.getElementById('page-' + id);
-      if (page) page.classList.add('active');
-
-      var navItems = document.querySelectorAll('.nav-item');
-      for (var j = 0; j < navItems.length; j++) {
-        var item = navItems[j];
-        item.classList.toggle('active', item.getAttribute('data-page') === id);
-      }
-    }
-  </script>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800">
-
-  <!-- 顶部导航 -->
-  <header class="sticky top-0 z-20 bg-white/90 border-b border-slate-200 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
+  <!-- 顶部导航 F1.3 -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
       <div class="flex items-center gap-8">
-        <div class="font-semibold text-lg text-accent cursor-pointer" onclick="showPage('home')">
+        <a href="#" onclick="showPage('home'); return false;" class="font-semibold text-lg text-accent flex items-center gap-2">
+          <i data-lucide="briefcase" class="w-5 h-5 text-primary"></i>
           Offer信息站
-        </div>
-        <nav class="hidden md:flex items-center text-sm text-slate-600">
-          <span class="nav-item active" data-page="home" onclick="showPage('home')">首页</span>
-          <span class="nav-item" data-page="campus" onclick="showPage('campus')">校招信息表</span>
+        </a>
+        <nav class="hidden md:flex items-center">
+          <span class="nav-item active transition-default" data-page="home">首页</span>
+          <span class="nav-item transition-default" data-page="campus-list">校招信息表</span>
+          <span class="nav-item transition-default" data-page="career-list">事业编国企表</span>
+          <span class="nav-item transition-default" data-page="docs">面试资料</span>
         </nav>
       </div>
       <div class="flex items-center gap-3">
-        <button type="button" class="btn-outline px-3 py-1.5 rounded-full text-xs">官方小程序</button>
-        <button type="button" id="btnLogin" class="btn-primary px-4 py-1.5 rounded-full text-xs font-medium">
-          求职者登录
+        <button type="button" class="btn-outline px-3 py-1.5 rounded-lg text-sm font-medium transition-default cursor-pointer flex items-center gap-1.5">
+          <i data-lucide="smartphone" class="w-4 h-4"></i> 官方小程序
         </button>
+        <!-- 非登录：显示登录按钮 -->
+        <div id="header-guest" class="flex items-center gap-3">
+          <button type="button" id="btnLogin" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium transition-default cursor-pointer">求职者登录</button>
+        </div>
+        <!-- 已登录：头像 + 下拉 -->
+        <div id="header-user" class="hidden relative">
+          <button type="button" id="btn-user-menu" class="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-default cursor-pointer">
+            <span class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600"><i data-lucide="user" class="w-4 h-4"></i></span>
+            <span id="header-user-label" class="text-sm text-slate-700 hidden sm:inline">已登录</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500"></i>
+          </button>
+          <div id="header-user-dropdown" class="hidden absolute right-0 top-full mt-1 w-72 rounded-xl border border-slate-200 bg-white shadow-lg z-[100] overflow-hidden">
+            <!-- 会员状态卡片：非会员 / 会员 两种展示 -->
+            <div id="header-member-card" class="p-4 border-b border-slate-100">
+              <div id="header-member-not" class="text-sm text-slate-600">
+                <p class="font-medium text-slate-800 mb-1">开通会员解锁更多权益</p>
+                <p class="text-xs text-slate-500 mb-2">校招/事业编投递链接、投递看板、简历库</p>
+                <a href="#" onclick="showPage('package'); closeHeaderDropdown(); return false;" class="text-primary text-sm font-medium cursor-pointer">查看会员权益 &gt;</a>
+              </div>
+              <div id="header-member-yes" class="hidden text-sm">
+                <p class="font-medium text-slate-800 mb-1 text-emerald-700">已开通校招/事业编会员</p>
+                <p id="header-member-expire" class="text-xs text-slate-500 mb-2">到期日 2026-12-31</p>
+                <a href="#" onclick="showPage('benefits'); closeHeaderDropdown(); return false;" class="text-accent-light text-sm cursor-pointer">查看会员权益 &gt;</a>
+              </div>
+            </div>
+            <div class="py-1">
+              <a href="#" onclick="openWorkbench('board'); closeHeaderDropdown(); return false;" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"><i data-lucide="layout-grid" class="w-4 h-4 text-slate-400"></i> 投递进度</a>
+              <a href="#" onclick="openWorkbench('resume'); closeHeaderDropdown(); return false;" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"><i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i> 我的简历</a>
+              <a href="#" onclick="openWorkbench('settings'); closeHeaderDropdown(); return false;" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"><i data-lucide="settings" class="w-4 h-4 text-slate-400"></i> 账号设置</a>
+              <a href="#" onclick="showPage('benefits'); closeHeaderDropdown(); return false;" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"><i data-lucide="gift" class="w-4 h-4 text-slate-400"></i> 查看会员权益</a>
+            </div>
+            <div class="border-t border-slate-100 py-1">
+              <button type="button" id="btn-logout" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 cursor-pointer text-left"><i data-lucide="log-out" class="w-4 h-4 text-slate-400"></i> 退出登录</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-6">
-
-    <!-- 首页简版 -->
+  <main class="min-h-[calc(100vh-3.5rem)]">
+    <!-- ========== 首页 F2.1：统计数据看板 + 介绍 + 引导 ========== -->
     <section id="page-home" class="page active">
-      <h1 class="text-2xl font-semibold mb-4 mt-2">首页（示意）</h1>
-      <p class="text-sm text-slate-600 mb-6">
-        点击顶部「校招信息表」查看完整的校招页面原型。
-      </p>
-      <button class="btn-primary px-4 py-2 rounded-lg text-sm" onclick="showPage('campus')">
-        进入校招信息表
-      </button>
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <!-- 统计数据看板 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <div class="stat-card bg-white rounded-xl border border-slate-200 p-5 transition-default shadow-card">
+            <div class="text-2xl font-bold text-accent">31,679</div>
+            <div class="text-sm text-slate-500 mt-1">校招企业</div>
+            <div class="flex items-center gap-1 mt-2 text-xs text-emerald-600">
+              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> 持续更新
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-xl border border-slate-200 p-5 transition-default shadow-card">
+            <div class="text-2xl font-bold text-accent">2,800+</div>
+            <div class="text-sm text-slate-500 mt-1">事业编公告</div>
+            <div class="flex items-center gap-1 mt-2 text-xs text-slate-400">事业单位 / 国企 / 教师编</div>
+          </div>
+          <div class="stat-card bg-white rounded-xl border border-slate-200 p-5 transition-default shadow-card">
+            <div class="text-2xl font-bold text-primary">156</div>
+            <div class="text-sm text-slate-500 mt-1">今日更新</div>
+            <div class="flex items-center gap-1 mt-2 text-xs text-slate-400">24h 信息刷新</div>
+          </div>
+          <div class="stat-card bg-white rounded-xl border border-slate-200 p-5 transition-default shadow-card">
+            <div class="text-2xl font-bold text-accent">120+</div>
+            <div class="text-sm text-slate-500 mt-1">面试资料</div>
+            <div class="flex items-center gap-1 mt-2 text-xs text-slate-400">大厂真题 / 结构化面试</div>
+          </div>
+        </div>
+
+        <!-- 产品介绍 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 mb-12 shadow-card">
+          <h2 class="text-xl font-semibold text-accent mb-3">关于 Offer信息站</h2>
+          <p class="text-slate-600 leading-relaxed max-w-3xl">
+            Offer信息站是<strong class="text-slate-800">24h 全网校招与事业编信息刷新</strong>的一站式平台。我们聚合企业校招、事业单位与国企公告，支持多维度筛选与关键词搜索；开通会员即可解锁投递链接与原文链接，并可使用<strong class="text-slate-800">投递看板</strong>管理进度、<strong class="text-slate-800">简历库</strong>关联投递，让求职信息不遗漏、进度不混乱。
+          </p>
+        </div>
+
+        <!-- 使用引导：三步 -->
+        <div class="mb-12">
+          <h2 class="text-lg font-semibold text-slate-800 mb-6">如何使用</h2>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="flex gap-4 items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <i data-lucide="search" class="w-5 h-5 text-primary"></i>
+              </div>
+              <div>
+                <div class="font-medium text-slate-800">1. 浏览与筛选</div>
+                <p class="text-sm text-slate-500 mt-1">在校招表或事业编表中按城市、行业、岗位类型筛选，搜索心仪企业与岗位。</p>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <i data-lucide="unlock" class="w-5 h-5 text-primary"></i>
+              </div>
+              <div>
+                <div class="font-medium text-slate-800">2. 开通会员解锁链接</div>
+                <p class="text-sm text-slate-500 mt-1">非会员仅可浏览信息，投递链接与原文链接需开通校招/事业编会员后解锁。</p>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <i data-lucide="layout-grid" class="w-5 h-5 text-primary"></i>
+              </div>
+              <div>
+                <div class="font-medium text-slate-800">3. 投递看板管理进度</div>
+                <p class="text-sm text-slate-500 mt-1">在投递看板中标记阶段（已投/笔试/面试/OC），隐藏已投递，一目了然。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 核心功能入口卡片 -->
+        <div class="mb-12">
+          <h2 class="text-lg font-semibold text-slate-800 mb-6">核心功能</h2>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="feature-card rounded-xl border border-slate-200 bg-white p-6 transition-default shadow-card" onclick="showPage('campus-list')">
+              <div class="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
+                <i data-lucide="building-2" class="w-6 h-6 text-accent"></i>
+              </div>
+              <div class="font-semibold text-slate-800 mb-2">校招信息表</div>
+              <p class="text-sm text-slate-500 mb-4">浏览与筛选校招岗位，按招聘类型、企业性质、城市筛选，解锁投递链接。</p>
+              <span class="text-primary text-sm font-medium cursor-pointer inline-flex items-center gap-1">进入校招表 <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+            </div>
+            <div class="feature-card rounded-xl border border-slate-200 bg-white p-6 transition-default shadow-card" onclick="showPage('career-list')">
+              <div class="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
+                <i data-lucide="landmark" class="w-6 h-6 text-accent"></i>
+              </div>
+              <div class="font-semibold text-slate-800 mb-2">事业编国企表</div>
+              <p class="text-sm text-slate-500 mb-4">事业单位、国企、银行、教师编公告，按省份与类型筛选，查看详情与原文。</p>
+              <span class="text-primary text-sm font-medium cursor-pointer inline-flex items-center gap-1">进入事业编表 <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+            </div>
+            <div class="feature-card rounded-xl border border-slate-200 bg-white p-6 transition-default shadow-card" onclick="showPage('docs')">
+              <div class="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
+                <i data-lucide="file-text" class="w-6 h-6 text-accent"></i>
+              </div>
+              <div class="font-semibold text-slate-800 mb-2">面试资料</div>
+              <p class="text-sm text-slate-500 mb-4">免费预览前 3 页，购买解锁全文；大厂真题与结构化面试资料。</p>
+              <span class="text-primary text-sm font-medium cursor-pointer inline-flex items-center gap-1">进入面试资料 <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 会员权益对比 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 mb-10 shadow-card">
+          <h2 class="text-lg font-semibold text-slate-800 mb-4">会员权益对比</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="border-b border-slate-200">
+                  <th class="pb-3 pr-4 font-medium text-slate-700">功能</th>
+                  <th class="pb-3 pr-4 font-medium text-slate-700">免费用户</th>
+                  <th class="pb-3 font-medium text-slate-700">会员</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-600">
+                <tr class="border-b border-slate-100"><td class="py-3 pr-4">投递链接 / 原文链接</td><td class="py-3 pr-4">锁定</td><td class="py-3">解锁</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-3 pr-4">投递看板与简历库</td><td class="py-3 pr-4">—</td><td class="py-3">可用</td></tr>
+                <tr><td class="py-3 pr-4">分组与隐藏已投递</td><td class="py-3 pr-4">—</td><td class="py-3">可用</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-6">
+            <button type="button" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer transition-default" onclick="showPage('package')">立即开通会员</button>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- 校招信息表页面 -->
-    <section id="page-campus" class="page">
-      <!-- 统计区 -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-4 mt-2">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-          <div class="font-semibold text-slate-800 text-sm">24h 校招求职会员信息动态</div>
-          <div class="text-xs text-slate-400">最近更新：2026-02-25</div>
+    <!-- 校招列表 F3.1 + F3.2 -->
+    <section id="page-campus-list" class="page">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <!-- 24h 校招求职会员信息动态 -->
+        <div class="bg-white rounded-xl border border-slate-200 p-5 mb-4 shadow-card">
+          <p class="text-xs text-slate-500 mb-4">更新日期：2026年3月5日</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div>
+              <div class="text-xl font-bold text-primary">128</div>
+              <div class="text-xs text-slate-500 mt-0.5">24h 内新增</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold text-primary">23</div>
+              <div class="text-xs text-slate-500 mt-0.5">今日截止</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold text-accent">892</div>
+              <div class="text-xs text-slate-500 mt-0.5">7 日内更新</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold text-accent">3,240</div>
+              <div class="text-xs text-slate-500 mt-0.5">30 日内更新</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold text-accent">31,679</div>
+              <div class="text-xs text-slate-500 mt-0.5">累计职位数</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold text-accent">1,856</div>
+              <div class="text-xs text-slate-500 mt-0.5">日常实习在招</div>
+            </div>
+          </div>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center text-xs">
-          <div>
-            <div class="text-xl font-bold text-primary">32</div>
-            <div class="text-slate-500 mt-1">24h 内新增</div>
+
+        <!-- 会员引导条：未登录/未开通显示 CTA，已开通不显示或弱提示 -->
+        <div id="campus-member-banner" class="mb-5">
+          <div id="campus-banner-cta" class="bg-primary/5 border border-primary/20 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-slate-700">购买校招会员享受求职优享服务，每日实时更新，可管理投递进度、使用投递看板与简历库。</p>
+            <button type="button" id="btn-campus-open-member" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-default shrink-0">立即开启会员权益</button>
           </div>
-          <div>
-            <div class="text-xl font-bold text-amber-500">4</div>
-            <div class="text-slate-500 mt-1">今日截止</div>
+          <div id="campus-banner-member" class="hidden text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5">您已是校招会员，可查看投递链接、使用投递看板与简历管理。</div>
+        </div>
+
+        <!-- 原型：模拟已开通校招会员（便于对比已付费操作） -->
+        <div class="mb-4 flex items-center gap-2 text-sm text-slate-600">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="chk-simulate-campus-member" class="rounded border-slate-300" />
+            模拟已开通校招会员
+          </label>
+        </div>
+
+        <!-- 首行筛选：模糊搜索 + 求职进度、我的筛选分组、仅看收藏（全员可见）；重置 + 筛选（展开/收起） -->
+        <div class="flex flex-wrap gap-3 items-center mb-3">
+          <input type="text" id="campus-search" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-48 sm:w-56 flex-shrink-0" placeholder="搜索职位、公司" />
+          <span class="text-slate-500 text-xs">求职进度</span>
+          <select id="campus-progress-select" class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm w-28 cursor-pointer"><option value="">全部</option><option>待投递</option><option>已投递</option><option>待笔试</option><option>已笔试</option><option>一面</option><option>二面</option><option>三面</option><option>已offer</option><option>未通过</option></select>
+          <span class="text-slate-500 text-xs">我的筛选分组</span>
+          <select id="campus-filter-group-select" class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm w-32 cursor-pointer"><option>我的筛选分组</option></select>
+          <button type="button" id="btn-save-filter" class="btn-outline px-2 py-1.5 rounded-lg text-xs cursor-pointer shrink-0">保存当前筛选</button>
+          <button type="button" class="btn-outline px-2 py-1.5 rounded-lg text-xs cursor-pointer shrink-0">管理</button>
+          <label class="flex items-center gap-1.5 cursor-pointer text-sm text-slate-600 shrink-0">
+            <input type="checkbox" id="chk-fav-only" class="rounded border-slate-300" /> 仅看收藏
+          </label>
+          <span id="campus-fav-count" class="text-accent-light text-xs">(0)</span>
+          <button type="button" id="btn-campus-reset" class="btn-outline px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-default shrink-0">重置</button>
+          <button type="button" id="btn-campus-filter-toggle" class="btn-outline px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-default border-accent text-accent-light shrink-0 flex items-center gap-1">
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 js-filter-chevron transition-transform"></i> 筛选
+          </button>
+        </div>
+
+        <!-- 展开区：招聘类型（默认全部）、招聘范围、行业、城市、企业类型、网申截止、搜索（默认收起） -->
+        <div id="campus-filter-expand" class="hidden border border-slate-200 rounded-lg bg-slate-50/50 p-3 mb-4">
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">招聘类型</span>
+            <button type="button" class="filter-pill active px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-primary bg-primary/10 text-primary" data-filter="type" data-value="全部">全部</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="type" data-value="26届春招">26届春招</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="type" data-value="26届秋招">26届秋招</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="type" data-value="日常实习">日常实习</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="type" data-value="暑期实习">暑期实习</button>
+            <button type="button" class="filter-pill filter-more px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer" data-more="type">更多</button>
           </div>
-          <div>
-            <div class="text-xl font-bold text-accent">182</div>
-            <div class="text-slate-500 mt-1">7 日内更新</div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">招聘范围</span>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="scope" data-value="25届">25届</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="scope" data-value="26届">26届</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="scope" data-value="27届">27届</button>
+            <button type="button" class="filter-pill filter-more px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer" data-more="scope">更多</button>
           </div>
-          <div>
-            <div class="text-xl font-bold text-accentLight">673</div>
-            <div class="text-slate-500 mt-1">30 日内更新</div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">行业</span>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer" data-filter="industry" data-value="不限">不限</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="industry" data-value="金融">金融</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="industry" data-value="人工智能">人工智能</button>
+            <button type="button" class="filter-pill filter-more px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer" data-more="industry">更多</button>
           </div>
-          <div>
-            <div class="text-xl font-bold text-emerald-600">3,880</div>
-            <div class="text-slate-500 mt-1">日常实习岗位</div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">城市</span>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="city" data-value="全国">全国</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="city" data-value="北京">北京</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="city" data-value="上海">上海</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="city" data-value="广州">广州</button>
+            <button type="button" class="filter-pill filter-more px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer" data-more="city">更多</button>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">企业类型</span>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="companyType" data-value="国企">国企</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="companyType" data-value="民企">民企</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="companyType" data-value="合资">合资</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="companyType" data-value="外企">外企</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="companyType" data-value="事业单位">事业单位</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="companyType" data-value="公益性">公益性</button>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">网申截止</span>
+            <button type="button" class="js-deadline-quick btn-outline px-2.5 py-1 rounded text-xs cursor-pointer" data-range="today">今日截止</button>
+            <button type="button" class="js-deadline-quick btn-outline px-2.5 py-1 rounded text-xs cursor-pointer" data-range="3">近三天</button>
+            <button type="button" class="js-deadline-quick btn-outline px-2.5 py-1 rounded text-xs cursor-pointer" data-range="7">近七天</button>
+            <input type="text" class="border border-slate-200 rounded px-2 py-1 text-xs w-24" placeholder="开始" readonly />
+            <span class="text-slate-400 text-xs">至</span>
+            <input type="text" class="border border-slate-200 rounded px-2 py-1 text-xs w-24" placeholder="结束" readonly />
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[1100px] text-sm">
+              <thead><tr class="bg-slate-50 border-b border-slate-200">
+                <th class="text-left py-3 px-4 font-medium text-slate-700">更新时间</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">公司名称</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">岗位</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">工作城市</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">行业</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">信息来源</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">网申时间</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">招聘范围</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">投递链接</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">操作专区</th>
+              </tr></thead>
+              <tbody>
+                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-default">
+                  <td class="py-3 px-4 text-slate-600">2026.02.25</td>
+                  <td class="py-3 px-4"><span class="inline-block px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800 mr-1">事业单位</span>某省某单位</td>
+                  <td class="py-3 px-4">产品经理、产品运营 <a href="#" class="text-accent-light cursor-pointer hover:underline ml-1">详情</a></td>
+                  <td class="py-3 px-4">合肥市、北京市</td>
+                  <td class="py-3 px-4">教育/科研</td>
+                  <td class="py-3 px-4">官方公众号：<a href="#" class="text-accent-light cursor-pointer hover:underline" data-action="campus-original">公告原文</a></td>
+                  <td class="py-3 px-4">2026-02-24 至 2026-11-30</td>
+                  <td class="py-3 px-4">26届、27届</td>
+                  <td class="py-3 px-4">
+                    <a href="#" class="text-primary font-medium cursor-pointer hover:underline inline-flex items-center gap-1" data-action="campus-apply"><i data-lucide="lock" class="w-3.5 h-3.5 js-lock-icon"></i><span class="js-apply-text">登录后可查看</span></a>
+                  </td>
+                  <td class="py-3 px-4 js-campus-ops">
+                    <select class="border border-slate-200 rounded px-2 py-1 text-xs w-20 cursor-pointer js-stage-select"><option>暂无</option><option>待投递</option><option>已投递</option><option>待笔试</option><option>已笔试</option><option>一面</option><option>二面</option><option>三面</option><option>已offer</option><option>未通过</option></select>
+                    <button type="button" class="btn-outline px-2 py-1 rounded text-xs cursor-pointer ml-1 js-remark-btn">编辑备注</button>
+                    <button type="button" class="p-1 rounded text-slate-400 hover:text-primary hover:bg-primary/10 transition-default cursor-pointer js-campus-fav ml-1" title="收藏" aria-label="收藏"><i data-lucide="star" class="w-4 h-4"></i></button>
+                  </td>
+                </tr>
+                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-default">
+                  <td class="py-3 px-4 text-slate-600">2026.02.24</td>
+                  <td class="py-3 px-4"><span class="inline-block px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 mr-1">合资</span>某科技公司</td>
+                  <td class="py-3 px-4">技术岗、算法岗 <a href="#" class="text-accent-light cursor-pointer hover:underline ml-1">详情</a></td>
+                  <td class="py-3 px-4">重庆市、成都市</td>
+                  <td class="py-3 px-4">人工智能</td>
+                  <td class="py-3 px-4">官网：<a href="#" class="text-accent-light cursor-pointer hover:underline" data-action="campus-original">公告原文</a></td>
+                  <td class="py-3 px-4">尽快投递</td>
+                  <td class="py-3 px-4">26届</td>
+                  <td class="py-3 px-4">
+                    <a href="#" class="text-primary font-medium cursor-pointer hover:underline inline-flex items-center gap-1" data-action="campus-apply"><i data-lucide="lock" class="w-3.5 h-3.5 js-lock-icon"></i><span class="js-apply-text">登录后可查看</span></a>
+                  </td>
+                  <td class="py-3 px-4 js-campus-ops">
+                    <select class="border border-slate-200 rounded px-2 py-1 text-xs w-20 cursor-pointer js-stage-select"><option>暂无</option><option>待投递</option><option>已投递</option></select>
+                    <button type="button" class="btn-outline px-2 py-1 rounded text-xs cursor-pointer ml-1 js-remark-btn">编辑备注</button>
+                    <button type="button" class="p-1 rounded text-slate-400 hover:text-primary hover:bg-primary/10 transition-default cursor-pointer js-campus-fav ml-1" title="收藏" aria-label="收藏"><i data-lucide="star" class="w-4 h-4"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-slate-500">共 2 条，当前第 1 页</p>
+      </div>
+    </section>
+
+    <!-- 事业编列表 F4.1（样式与校招表一致） -->
+    <section id="page-career-list" class="page">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <!-- 事业编会员引导条 -->
+        <div id="career-member-banner" class="mb-5">
+          <div id="career-banner-cta" class="bg-primary/5 border border-primary/20 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-slate-700">购买事业编会员可查看报名/原文链接，管理投递进度、使用投递看板与简历库。</p>
+            <button type="button" id="btn-career-open-member" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-default shrink-0">立即开启会员权益</button>
+          </div>
+          <div id="career-banner-member" class="hidden text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5">您已是事业编会员，可查看报名链接、使用投递看板与简历管理。</div>
+        </div>
+        <div class="mb-4 flex items-center gap-2 text-sm text-slate-600">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="chk-simulate-career-member" class="rounded border-slate-300" />
+            模拟已开通事业编会员
+          </label>
+        </div>
+
+        <!-- 首行筛选：模糊搜索 + 求职进度、我的筛选分组、仅看收藏、重置、筛选展开 -->
+        <div class="flex flex-wrap gap-3 items-center mb-3">
+          <input type="text" id="career-search" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-48 sm:w-56 flex-shrink-0" placeholder="搜索公告标题、招聘职位" />
+          <span class="text-slate-500 text-xs">求职进度</span>
+          <select id="career-progress-select" class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm w-28 cursor-pointer">
+            <option value="">全部</option>
+            <option>待投递</option>
+            <option>已报名</option>
+            <option>笔试</option>
+            <option>面试</option>
+            <option>录用</option>
+            <option>未过</option>
+          </select>
+          <span class="text-slate-500 text-xs">我的筛选分组</span>
+          <select id="career-filter-group-select" class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm w-32 cursor-pointer"><option>我的筛选分组</option></select>
+          <button type="button" id="btn-career-save-filter" class="btn-outline px-2 py-1.5 rounded-lg text-xs cursor-pointer shrink-0">保存当前筛选</button>
+          <button type="button" class="btn-outline px-2 py-1.5 rounded-lg text-xs cursor-pointer shrink-0">管理</button>
+          <label class="flex items-center gap-1.5 cursor-pointer text-sm text-slate-600 shrink-0">
+            <input type="checkbox" id="chk-career-fav-only" class="rounded border-slate-300" /> 仅看收藏
+          </label>
+          <span id="career-fav-count" class="text-accent-light text-xs">(0)</span>
+          <button type="button" id="btn-career-reset" class="btn-outline px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-default shrink-0">重置</button>
+          <button type="button" id="btn-career-filter-toggle" class="btn-outline px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-default border-accent text-accent-light shrink-0 flex items-center gap-1">
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 js-career-filter-chevron transition-transform"></i> 筛选
+          </button>
+        </div>
+
+        <!-- 展开区：类型、省/市/区、学历、报名截止 -->
+        <div id="career-filter-expand" class="hidden border border-slate-200 rounded-lg bg-slate-50/50 p-3 mb-4">
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">类型</span>
+            <button type="button" class="filter-pill active px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-primary bg-primary/10 text-primary" data-filter="career-type" data-value="全部">全部</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-type" data-value="事业单位">事业单位</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-type" data-value="国企">国企</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-type" data-value="银行">银行</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-type" data-value="教师编">教师编</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-type" data-value="其他">其他</button>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">省份/城市/区域</span>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-region" data-value="国家级">国家级</button>
+            <select id="career-province" class="border border-slate-200 rounded px-2 py-1 text-xs w-24"><option value="">省份</option><option>安徽省</option><option>北京市</option><option>广东省</option><option>江苏省</option></select>
+            <select id="career-city" class="border border-slate-200 rounded px-2 py-1 text-xs w-24"><option value="">城市</option><option>合肥市</option><option>芜湖市</option></select>
+            <select id="career-district" class="border border-slate-200 rounded px-2 py-1 text-xs w-24"><option value="">区域</option><option>蜀山区</option><option>包河区</option></select>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">学历要求</span>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-edu" data-value="不限">不限</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-edu" data-value="大专">大专</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-edu" data-value="本科">本科</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-edu" data-value="硕士">硕士</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border transition-default cursor-pointer border-slate-200 text-slate-600 hover:border-slate-300" data-filter="career-edu" data-value="博士">博士</button>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 items-center mb-2">
+            <span class="text-xs text-slate-500 w-full sm:w-auto">报名截止</span>
+            <button type="button" class="js-career-deadline-quick btn-outline px-2.5 py-1 rounded text-xs cursor-pointer" data-range="today">今日截止</button>
+            <button type="button" class="js-career-deadline-quick btn-outline px-2.5 py-1 rounded text-xs cursor-pointer" data-range="3">近三天</button>
+            <button type="button" class="js-career-deadline-quick btn-outline px-2.5 py-1 rounded text-xs cursor-pointer" data-range="7">近七天</button>
+            <input type="text" class="border border-slate-200 rounded px-2 py-1 text-xs w-24" placeholder="开始" readonly />
+            <span class="text-slate-400 text-xs">至</span>
+            <input type="text" class="border border-slate-200 rounded px-2 py-1 text-xs w-24" placeholder="结束" readonly />
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[1200px] text-sm">
+              <thead><tr class="bg-slate-50 border-b border-slate-200">
+                <th class="text-left py-3 px-4 font-medium text-slate-700">更新时间</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">公告标题</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">省份/市/区域</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">类型</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">报名时间</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">招聘人数</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">学历要求</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">年龄要求</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">报名链接</th>
+                <th class="text-left py-3 px-4 font-medium text-slate-700">操作专区</th>
+              </tr></thead>
+              <tbody>
+                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-default">
+                  <td class="py-3 px-4 text-slate-600">2026.02.25</td>
+                  <td class="py-3 px-4"><a href="#" class="text-accent-light cursor-pointer hover:underline js-career-detail-link">某省 2026 年事业单位公开招聘</a></td>
+                  <td class="py-3 px-4">安徽省 / 合肥市 / 蜀山区</td>
+                  <td class="py-3 px-4"><span class="inline-block px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800">事业单位</span></td>
+                  <td class="py-3 px-4">2026-02-01 至 2026-03-15</td>
+                  <td class="py-3 px-4">100</td>
+                  <td class="py-3 px-4">本科及以上</td>
+                  <td class="py-3 px-4">35周岁及以下</td>
+                  <td class="py-3 px-4">
+                    <a href="#" class="text-primary font-medium cursor-pointer hover:underline inline-flex items-center gap-1" data-action="career-original"><i data-lucide="lock" class="w-3.5 h-3.5 js-career-lock-icon"></i><span class="js-career-link-text">登录后可查看 🔒</span></a>
+                  </td>
+                  <td class="py-3 px-4 js-career-ops">
+                    <a href="#" class="text-accent-light cursor-pointer hover:underline js-career-detail-link">查看详情</a>
+                    <select class="border border-slate-200 rounded px-2 py-1 text-xs w-20 cursor-pointer js-career-stage-select ml-1"><option>暂无</option><option>已报名</option><option>笔试</option><option>面试</option><option>录用</option><option>未过</option></select>
+                    <button type="button" class="btn-outline px-2 py-1 rounded text-xs cursor-pointer ml-1 js-career-remark-btn">编辑备注</button>
+                    <button type="button" class="p-1 rounded text-slate-400 hover:text-primary hover:bg-primary/10 transition-default cursor-pointer js-career-fav ml-1" title="收藏" aria-label="收藏"><i data-lucide="star" class="w-4 h-4"></i></button>
+                  </td>
+                </tr>
+                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-default">
+                  <td class="py-3 px-4 text-slate-600">2026.02.24</td>
+                  <td class="py-3 px-4"><a href="#" class="text-accent-light cursor-pointer hover:underline js-career-detail-link">某央企 2026 年度社会招聘公告</a></td>
+                  <td class="py-3 px-4">国家级</td>
+                  <td class="py-3 px-4"><span class="inline-block px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800">国企</span></td>
+                  <td class="py-3 px-4">2026-03-01 至 2026-04-30</td>
+                  <td class="py-3 px-4">50</td>
+                  <td class="py-3 px-4">硕士及以上</td>
+                  <td class="py-3 px-4">40周岁及以下</td>
+                  <td class="py-3 px-4">
+                    <a href="#" class="text-primary font-medium cursor-pointer hover:underline inline-flex items-center gap-1" data-action="career-original"><i data-lucide="lock" class="w-3.5 h-3.5 js-career-lock-icon"></i><span class="js-career-link-text">登录后可查看 🔒</span></a>
+                  </td>
+                  <td class="py-3 px-4 js-career-ops">
+                    <a href="#" class="text-accent-light cursor-pointer hover:underline js-career-detail-link">查看详情</a>
+                    <select class="border border-slate-200 rounded px-2 py-1 text-xs w-20 cursor-pointer js-career-stage-select ml-1"><option>暂无</option><option>已报名</option></select>
+                    <button type="button" class="btn-outline px-2 py-1 rounded text-xs cursor-pointer ml-1 js-career-remark-btn">编辑备注</button>
+                    <button type="button" class="p-1 rounded text-slate-400 hover:text-primary hover:bg-primary/10 transition-default cursor-pointer js-career-fav ml-1" title="收藏" aria-label="收藏"><i data-lucide="star" class="w-4 h-4"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-slate-500">共 2 条，当前第 1 页</p>
+      </div>
+    </section>
+
+    <!-- 事业编详情页 F4.3（新页面，从列表「查看详情」跳转） -->
+    <section id="page-career-detail" class="page">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+        <a href="#" onclick="showPage('career-list'); return false;" class="inline-flex items-center gap-1 text-sm text-accent-light hover:underline mb-4 cursor-pointer"><i data-lucide="arrow-left" class="w-4 h-4"></i> 返回事业编列表</a>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-card overflow-hidden">
+          <div class="p-6 border-b border-slate-100">
+            <h1 class="text-xl font-semibold text-slate-800 mb-2">某省 2026 年事业单位公开招聘</h1>
+            <div class="flex flex-wrap gap-2 items-center text-sm text-slate-600">
+              <span class="inline-block px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800">事业单位</span>
+              <span>更新时间：2026-02-25</span>
+              <span>报名时间：2026-02-01 至 2026-03-15</span>
+              <span>安徽省 / 合肥市 / 蜀山区</span>
+            </div>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="flex flex-wrap gap-4 text-sm">
+              <span><strong class="text-slate-700">招聘人数：</strong>100</span>
+              <span><strong class="text-slate-700">学历要求：</strong>本科及以上</span>
+              <span><strong class="text-slate-700">年龄要求：</strong>35周岁及以下</span>
+            </div>
+            <div>
+              <p class="text-sm text-slate-600 mb-2">报名链接</p>
+              <a href="#" class="btn-primary inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer" data-action="career-original">打开报名/原文链接</a>
+              <span class="js-career-detail-link-lock hidden text-slate-500 text-sm ml-2">🔒 开通事业编会员后可见</span>
+            </div>
+            <div class="border-t border-slate-100 pt-4">
+              <h2 class="text-base font-semibold text-slate-800 mb-2">公告原文</h2>
+              <div class="prose prose-sm max-w-none text-slate-700 leading-relaxed whitespace-pre-wrap border border-slate-100 rounded-lg p-4 bg-slate-50/50">
+根据《事业单位人事管理条例》等有关规定，经研究，决定面向社会公开招聘工作人员，现将有关事项公告如下：
+
+一、招聘计划
+本次共招聘 100 名工作人员，具体岗位见附件。
+
+二、报考条件
+（一）具有中华人民共和国国籍；
+（二）遵守宪法和法律；
+（三）具有良好的品行；
+（四）岗位所需的专业或技能条件；
+（五）适应岗位要求的身体条件；
+（六）岗位所需的其他条件。
+
+三、报名方式与时间
+报名采取网上报名方式，报名时间为 2026 年 2 月 1 日至 3 月 15 日。请登录指定网站进行报名。
+
+四、考试安排
+笔试、面试时间及地点另行通知，请关注官网公告。
+              </div>
+            </div>
+            <div class="border-t border-slate-100 pt-4 flex flex-wrap gap-3 items-center">
+              <button type="button" class="btn-outline px-3 py-2 rounded-lg text-sm cursor-pointer flex items-center gap-1.5 js-career-fav"><i data-lucide="star" class="w-4 h-4"></i> 收藏</button>
+              <span class="text-slate-500 text-sm">投递进度</span>
+              <select class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm w-28 cursor-pointer js-career-stage-select"><option>暂无</option><option>已报名</option><option>笔试</option><option>面试</option><option>录用</option><option>未过</option></select>
+            </div>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- 会员引导条 -->
-      <div id="campus-banner"
-           class="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <span id="campus-banner-text" class="text-rose-800">
-          当前为未登录访客，仅可浏览基础信息；登录并开通校招会员后可解锁投递链接、投递看板与简历库。
-        </span>
-        <button id="campus-banner-btn"
-                class="btn-primary px-3 py-1.5 rounded-full text-[11px] font-medium">
-          登录并开通校招会员
-        </button>
+    <!-- 面试资料 F5：资料商城 / 我的资料（知识库式） -->
+    <section id="page-docs" class="page">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div class="flex items-center justify-between gap-4 mb-5">
+          <h2 class="text-xl font-semibold text-slate-800">面试资料</h2>
+          <div class="flex items-center gap-2">
+            <button type="button" class="docs-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer active" data-docstab="market">资料商城</button>
+            <button type="button" class="docs-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer" data-docstab="mine">我的资料</button>
+          </div>
+        </div>
+
+        <!-- 资料商城 -->
+        <div id="docs-market" class="docs-view">
+          <div class="flex flex-wrap gap-3 items-center mb-4">
+            <input type="text" id="docs-search-company" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-48 sm:w-64" placeholder="搜索企业（模糊）" />
+            <input type="text" id="docs-search-role" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-40 sm:w-56" placeholder="筛选岗位（如：产品/前端）" />
+            <span class="text-xs text-slate-500">岗位快捷</span>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer">产品</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer">前端</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer">后端</button>
+            <button type="button" class="filter-pill px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:border-slate-300 cursor-pointer">算法</button>
+          </div>
+
+          <div class="grid grid-cols-12 gap-6">
+            <!-- 行业（后台可维护） -->
+            <aside class="col-span-12 md:col-span-3 lg:col-span-2">
+              <div class="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-100 text-sm font-semibold text-slate-800">行业</div>
+                <div class="p-2">
+                  <button type="button" class="docs-industry w-full text-left px-3 py-2 rounded-lg text-sm cursor-pointer bg-primary/10 text-primary font-medium" data-ind="all">全部</button>
+                  <button type="button" class="docs-industry w-full text-left px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-slate-50" data-ind="internet">互联网</button>
+                  <button type="button" class="docs-industry w-full text-left px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-slate-50" data-ind="finance">金融</button>
+                  <button type="button" class="docs-industry w-full text-left px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-slate-50" data-ind="manufacturing">制造业</button>
+                  <button type="button" class="docs-industry w-full text-left px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-slate-50" data-ind="public">事业单位</button>
+                </div>
+              </div>
+              <p class="text-xs text-slate-500 mt-3">行业由后台资料管理配置（可维护）。</p>
+            </aside>
+
+            <!-- 资料列表 -->
+            <section class="col-span-12 md:col-span-9 lg:col-span-10">
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card transition-default hover:shadow-card-hover hover:border-primary/30 relative">
+                  <div class="h-36 bg-slate-100 flex items-center justify-center text-slate-400 cursor-pointer js-doc-open" data-doc="1"><i data-lucide="file-text" class="w-10 h-10"></i></div>
+                  <div class="p-4">
+                    <div class="font-medium text-slate-800 mb-1">某大厂产品岗面试真题</div>
+                    <div class="text-xs text-slate-500 mb-2">互联网 · 岗位：产品</div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-slate-600">¥9.9</span>
+                      <button type="button" class="btn-outline px-3 py-1 rounded text-xs cursor-pointer js-doc-open" data-doc="1">预览</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card transition-default hover:shadow-card-hover hover:border-primary/30 relative">
+                  <span class="js-doc-badge-2 hidden absolute top-2 right-2 px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-700 z-10">已购</span>
+                  <div class="h-36 bg-slate-100 flex items-center justify-center text-slate-400 cursor-pointer js-doc-open" data-doc="2"><i data-lucide="file-text" class="w-10 h-10"></i></div>
+                  <div class="p-4">
+                    <div class="font-medium text-slate-800 mb-1">事业单位结构化面试资料</div>
+                    <div class="text-xs text-slate-500 mb-2">事业单位 · 岗位：通用</div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-slate-600">¥9.9</span>
+                      <button type="button" class="btn-primary px-3 py-1 rounded text-xs cursor-pointer js-doc-open" data-doc="2">查看</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- 我的资料：知识库式（类似腾讯文档） -->
+        <div id="docs-mine" class="docs-view hidden">
+          <div class="grid grid-cols-12 gap-6">
+            <aside class="col-span-12 md:col-span-4 lg:col-span-3">
+              <div class="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-100">
+                  <div class="font-semibold text-slate-800">我的资料</div>
+                  <p class="text-xs text-slate-500 mt-1">仅预览与查看，不可编辑（未来扩展 AI 知识库）</p>
+                </div>
+                <div class="p-3">
+                  <input type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" placeholder="搜索已购资料" />
+                </div>
+                <div class="p-2">
+                  <button type="button" class="docs-mine-item w-full text-left px-3 py-2 rounded-lg text-sm cursor-pointer bg-slate-50" data-doc="2">
+                    <div class="flex items-center justify-between">
+                      <span class="truncate">事业单位结构化面试资料</span>
+                      <span class="px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-700">已购</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1">最近阅读：第 3 页</div>
+                  </button>
+                  <div class="text-xs text-slate-400 px-3 py-4">暂无更多资料</div>
+                </div>
+              </div>
+            </aside>
+            <section class="col-span-12 md:col-span-8 lg:col-span-9">
+              <div class="rounded-xl border border-slate-200 bg-white shadow-card p-10 text-center">
+                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-4"><i data-lucide="book-open" class="w-8 h-8"></i></div>
+                <p class="text-slate-600 mb-4">选择左侧资料开始阅读</p>
+                <button type="button" class="btn-outline px-5 py-2.5 rounded-lg text-sm cursor-pointer" onclick="showPage('docs-view')">打开示例阅读器</button>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <!-- 搜索 + 标签筛选 -->
-      <div class="mb-3">
-        <input
-          class="w-full max-w-xl border border-slate-200 rounded-full px-4 py-2.5 text-sm"
-          placeholder="搜索职位、公司，31679 家企业校招已更新" />
+    <!-- 面试资料文档查看页 F5.1：腾讯文档式，仅预览与查看不可编辑 -->
+    <section id="page-docs-view" class="page">
+      <div class="flex flex-col h-[calc(100vh-3.5rem)] bg-white">
+        <!-- 顶部栏：返回、标题、只读标识 -->
+        <div class="flex items-center gap-3 px-4 py-3 border-b border-slate-200 bg-slate-50/50 shrink-0">
+          <a href="#" onclick="showPage('docs'); return false;" class="p-1.5 rounded-lg hover:bg-slate-200/60 transition-default cursor-pointer"><i data-lucide="arrow-left" class="w-5 h-5 text-slate-600"></i></a>
+          <div class="flex-1 min-w-0">
+            <h1 id="docs-view-title" class="text-base font-semibold text-slate-800 truncate">事业单位结构化面试资料</h1>
+            <p class="text-xs text-slate-500 mt-0.5">仅支持预览与查看，不可编辑</p>
+          </div>
+          <span class="px-2 py-1 rounded text-xs bg-slate-200 text-slate-600">只读</span>
+        </div>
+        <!-- 文档内容区：模拟腾讯文档式阅读 -->
+        <div class="flex-1 overflow-auto p-6 md:p-10">
+          <div class="max-w-3xl mx-auto prose prose-slate prose-p:leading-relaxed text-slate-700">
+            <div id="docs-view-body" class="bg-white rounded-lg border border-slate-100 p-8 shadow-sm">
+              <h2 class="text-lg font-semibold text-slate-800 mb-4">一、结构化面试概述</h2>
+              <p class="mb-4">结构化面试是指根据特定职位的胜任特征要求，遵循固定程序，采用专门的题库、评价标准和评价方法，通过考官小组与应考者面对面的言语交流等方式，评价应考者是否符合招聘岗位要求的人才测评方法。</p>
+              <h2 class="text-lg font-semibold text-slate-800 mb-4">二、常见题型</h2>
+              <p class="mb-2"><strong>1. 综合分析</strong>：社会现象、政策理解、名言警句等。</p>
+              <p class="mb-2"><strong>2. 计划组织</strong>：活动策划、调研、宣传等。</p>
+              <p class="mb-4"><strong>3. 人际与应变</strong>：沟通协调、应急处理等。</p>
+              <h2 class="text-lg font-semibold text-slate-800 mb-4">三、答题要点</h2>
+              <p class="mb-4">条理清晰、扣题作答、联系实际、控制时间。本资料为示例内容，完整版请以实际文档为准。未来可在此扩展 AI 知识库与智能问答。</p>
+            </div>
+            <!-- 未购遮罩（预览页数后出现） -->
+            <div id="docs-paywall" class="hidden mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
+              <div class="p-6 bg-gradient-to-b from-white to-slate-50/80">
+                <div class="text-sm text-slate-600 mb-2">预览已结束</div>
+                <div class="text-lg font-semibold text-slate-800 mb-2">购买解锁全文阅读</div>
+                <p class="text-sm text-slate-500 mb-4">支持在线只读阅读与阅读进度记录，已购可在「我的资料」中查看。</p>
+                <button type="button" id="btn-doc-buy" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer">¥9.9 立即购买</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 底部区域：AI 知识库占位 + 下载带水印 PDF -->
+        <div class="shrink-0 border-t border-slate-100 px-4 py-3 bg-slate-50/50">
+          <div class="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            <p class="text-xs text-slate-500">后续将支持基于本资料的 AI 知识库问答</p>
+            <button
+              type="button"
+              id="btn-doc-download"
+              class="btn-outline px-4 py-1.5 rounded-lg text-xs md:text-sm text-slate-700 border-slate-300 cursor-pointer"
+            >
+              购买后可下载 PDF（含个人水印）
+            </button>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="flex flex-wrap gap-2 mb-3 text-xs">
-        <button class="px-3 py-1 rounded-full bg-primary text-white">全部</button>
-        <button class="px-3 py-1 rounded-full border border-slate-200 bg-white text-slate-700">
-          26届秋招
-        </button>
-        <button class="px-3 py-1 rounded-full border border-slate-200 bg-white text-slate-700">
-          日常实习
-        </button>
+    <!-- 工作台：参考 BOSS/简历中心（左侧栏 + 内容区） -->
+    <section id="page-workbench" class="page">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div class="grid grid-cols-12 gap-6">
+          <!-- 左侧栏 -->
+          <aside class="col-span-12 md:col-span-3 lg:col-span-2">
+            <div class="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
+              <div class="px-4 py-4 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600"><i data-lucide="user" class="w-5 h-5"></i></div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold text-slate-800 truncate">微信昵称</div>
+                  <div class="text-xs text-slate-500 truncate">求职工作台</div>
+                </div>
+              </div>
+              <nav class="p-2">
+                <button type="button" class="wb-nav-item w-full text-left px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-default flex items-center gap-2" data-wb="board">
+                  <i data-lucide="layout-grid" class="w-4 h-4 text-slate-400"></i> 投递进度
+                </button>
+                <button type="button" class="wb-nav-item w-full text-left px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-default flex items-center gap-2" data-wb="fav">
+                  <i data-lucide="heart" class="w-4 h-4 text-slate-400"></i> 收藏职位
+                </button>
+                <button type="button" class="wb-nav-item w-full text-left px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-default flex items-center gap-2" data-wb="resume">
+                  <i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i> 我的简历
+                </button>
+                <button type="button" class="wb-nav-item w-full text-left px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-default flex items-center gap-2" data-wb="settings">
+                  <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i> 账号设置
+                </button>
+              </nav>
+            </div>
+          </aside>
+
+          <!-- 右侧内容区 -->
+          <section class="col-span-12 md:col-span-9 lg:col-span-10">
+            <!-- 未登录态 -->
+            <div id="wb-guest" class="rounded-xl border border-slate-200 bg-white p-12 shadow-card text-center hidden">
+              <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-4"><i data-lucide="log-in" class="w-8 h-8"></i></div>
+              <p class="text-slate-600 mb-2">请先登录后使用工作台</p>
+              <button type="button" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer" onclick="openLoginModal()">登录</button>
+            </div>
+
+            <div id="wb-logged" class="hidden">
+              <!-- 投递进度（看板） -->
+              <div id="wb-view-board" class="wb-view hidden">
+                <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-4">
+                  <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                      <div class="text-lg font-semibold text-slate-800">投递进度</div>
+                      <div class="text-xs text-slate-500 mt-1">来源区分：校招信息表 / 事业编国企表；点击卡片可跳转对应详情。</div>
+                    </div>
+                    <div id="wb-board-cta" class="hidden">
+                      <button type="button" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium cursor-pointer" onclick="showPage('package')">开通会员使用看板</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="wb-board-kanban" class="flex gap-4 overflow-x-auto pb-3">
+                  <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div class="font-medium text-slate-700 mb-3">待投递</div>
+                    <div class="text-sm text-slate-400 py-2">暂无</div>
+                  </div>
+                  <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div class="font-medium text-slate-700 mb-3">已投递/已报名</div>
+                    <button type="button" class="w-full text-left rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default js-wb-apply-card" data-source="campus">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="font-medium text-slate-800 truncate">某科技公司 · 产品岗</div>
+                        <span class="px-2 py-0.5 rounded text-[11px] bg-accent/10 text-accent">校招表</span>
+                      </div>
+                      <div class="text-xs text-slate-500 mt-1">投递日：2026-03-01</div>
+                    </button>
+                    <button type="button" class="w-full text-left rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default mt-2 js-wb-apply-card" data-source="career">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="font-medium text-slate-800 truncate">某省事业单位公开招聘</div>
+                        <span class="px-2 py-0.5 rounded text-[11px] bg-amber-100 text-amber-800">事业编表</span>
+                      </div>
+                      <div class="text-xs text-slate-500 mt-1">报名日：2026-03-02</div>
+                    </button>
+                  </div>
+                  <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div class="font-medium text-slate-700 mb-3">笔试</div>
+                    <div class="text-sm text-slate-400 py-2">暂无</div>
+                  </div>
+                  <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div class="font-medium text-slate-700 mb-3">面试</div>
+                    <div class="text-sm text-slate-400 py-2">暂无</div>
+                  </div>
+                  <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div class="font-medium text-slate-700 mb-3">录用/Offer</div>
+                    <div class="text-sm text-slate-400 py-2">暂无</div>
+                  </div>
+                  <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div class="font-medium text-slate-700 mb-3">未过/放弃</div>
+                    <div class="text-sm text-slate-400 py-2">暂无</div>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">提示：阶段枚举与信息表行内「投递进度」一致；后续可支持拖拽卡片改阶段。</p>
+              </div>
+
+              <!-- 收藏职位 -->
+              <div id="wb-view-fav" class="wb-view hidden">
+                <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <div class="text-lg font-semibold text-slate-800">收藏职位</div>
+                      <p class="text-sm text-slate-600 mt-1">直接在此查看收藏，无需跳转信息表。</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2 mb-4">
+                    <button type="button" class="wb-fav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer active" data-favtab="campus">校招收藏</button>
+                    <button type="button" class="wb-fav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer" data-favtab="career">事业编收藏</button>
+                  </div>
+
+                  <div id="wb-fav-campus" class="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                    <div class="overflow-x-auto">
+                      <table class="w-full min-w-[860px] text-sm">
+                        <thead><tr class="bg-slate-50 border-b border-slate-200">
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">更新时间</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">公司</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">岗位</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">城市</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                        </tr></thead>
+                        <tbody>
+                          <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-default">
+                            <td class="py-3 px-4 text-slate-600">2026.03.05</td>
+                            <td class="py-3 px-4">某科技公司</td>
+                            <td class="py-3 px-4">产品经理</td>
+                            <td class="py-3 px-4">上海</td>
+                            <td class="py-3 px-4"><a href="#" class="text-accent-light hover:underline cursor-pointer js-wb-go-campus-detail">查看详情</a></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div id="wb-fav-career" class="hidden rounded-xl border border-slate-200 bg-white overflow-hidden">
+                    <div class="overflow-x-auto">
+                      <table class="w-full min-w-[920px] text-sm">
+                        <thead><tr class="bg-slate-50 border-b border-slate-200">
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">更新时间</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">公告标题</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">地区</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">类型</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate-700">操作</th>
+                        </tr></thead>
+                        <tbody>
+                          <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-default">
+                            <td class="py-3 px-4 text-slate-600">2026.03.02</td>
+                            <td class="py-3 px-4">某省 2026 年事业单位公开招聘</td>
+                            <td class="py-3 px-4">安徽省 / 合肥市 / 蜀山区</td>
+                            <td class="py-3 px-4"><span class="inline-block px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800">事业单位</span></td>
+                            <td class="py-3 px-4"><a href="#" class="text-accent-light hover:underline cursor-pointer js-wb-go-career-detail">查看详情</a></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 我的简历：参考你图的布局（主表单 + 右侧附件简历） -->
+              <div id="wb-view-resume" class="wb-view hidden">
+                <div class="grid grid-cols-12 gap-6">
+                  <div class="col-span-12 lg:col-span-8">
+                    <div class="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
+                      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <div>
+                          <div class="text-lg font-semibold text-slate-800">我的在线简历</div>
+                          <div class="text-xs text-slate-500 mt-1">仅预览/编辑个人简历信息（原型），后续可扩展 AI 简历优化</div>
+                        </div>
+                        <button type="button" class="btn-outline px-3 py-2 rounded-lg text-sm cursor-pointer">编辑</button>
+                      </div>
+                      <div class="p-6 space-y-6">
+                        <div>
+                          <div class="flex items-center justify-between mb-3">
+                            <div class="font-semibold text-slate-800">基本信息 <span class="text-xs text-slate-400 font-normal">（必填）</span></div>
+                            <button type="button" class="text-primary text-sm font-medium cursor-pointer">编辑</button>
+                          </div>
+                          <div class="grid sm:grid-cols-2 gap-4 text-sm text-slate-600">
+                            <div class="border border-slate-200 rounded-lg p-3">姓名：未知</div>
+                            <div class="border border-slate-200 rounded-lg p-3">手机号：未绑定</div>
+                            <div class="border border-slate-200 rounded-lg p-3">邮箱：—</div>
+                            <div class="border border-slate-200 rounded-lg p-3">所在地：—</div>
+                          </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-6">
+                          <div class="flex items-center justify-between mb-3">
+                            <div class="font-semibold text-slate-800">教育经历 <span class="text-xs text-slate-400 font-normal">（必填）</span></div>
+                            <button type="button" class="text-primary text-sm font-medium cursor-pointer">+ 添加</button>
+                          </div>
+                          <div class="border border-dashed border-slate-200 rounded-lg p-6 text-center text-sm text-slate-500">暂无教育经历（原型占位）</div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-6">
+                          <div class="flex items-center justify-between mb-3">
+                            <div class="font-semibold text-slate-800">求职意向</div>
+                            <button type="button" class="text-primary text-sm font-medium cursor-pointer">+ 添加</button>
+                          </div>
+                          <div class="grid sm:grid-cols-2 gap-4 text-sm text-slate-600">
+                            <div class="border border-slate-200 rounded-lg p-3">期望岗位：不限</div>
+                            <div class="border border-slate-200 rounded-lg p-3">期望城市：全国</div>
+                            <div class="border border-slate-200 rounded-lg p-3">期望薪资：面议</div>
+                            <div class="border border-slate-200 rounded-lg p-3">到岗时间：随时</div>
+                          </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-6">
+                          <div class="flex items-center justify-between mb-3">
+                            <div class="font-semibold text-slate-800">项目经历</div>
+                            <button type="button" class="text-primary text-sm font-medium cursor-pointer">+ 添加</button>
+                          </div>
+                          <div class="border border-dashed border-slate-200 rounded-lg p-6 text-center text-sm text-slate-500">暂无项目经历（原型占位）</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-12 lg:col-span-4">
+                    <div class="rounded-xl border border-slate-200 bg-white shadow-card p-6">
+                      <div class="font-semibold text-slate-800 mb-2">附件简历</div>
+                      <p class="text-xs text-slate-500 mb-4">支持上传 PDF/DOC/DOCX，便于投递时快速使用。</p>
+                      <div id="wb-attach-locked" class="rounded-lg border border-slate-200 bg-slate-50/50 p-4 text-sm text-slate-600">
+                        <p class="mb-3">开通会员后可上传附件简历，并与投递记录关联。</p>
+                        <button type="button" class="btn-primary w-full py-2.5 rounded-lg font-medium cursor-pointer" onclick="showPage('package')">开通会员</button>
+                      </div>
+                      <div id="wb-attach-open" class="hidden">
+                        <button type="button" class="btn-outline w-full py-2.5 rounded-lg font-medium cursor-pointer">上传附件简历</button>
+                        <div class="mt-4 text-sm text-slate-600">
+                          <div class="flex items-center justify-between py-2 border-b border-slate-100"><span>简历_v1.pdf</span><a href="#" class="text-accent-light hover:underline cursor-pointer">预览</a></div>
+                          <div class="flex items-center justify-between py-2"><span>简历_v2.docx</span><a href="#" class="text-accent-light hover:underline cursor-pointer">预览</a></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 账号设置 -->
+              <div id="wb-view-settings" class="wb-view hidden">
+                <div class="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
+                  <div class="px-6 py-5 border-b border-slate-100">
+                    <div class="text-lg font-semibold text-slate-800">账号设置</div>
+                    <p class="text-xs text-slate-500 mt-1">默认微信关注登录；也可在登录页切换「手机号短信登录」。</p>
+                  </div>
+                  <div class="p-6 space-y-4">
+                    <div class="flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-4">
+                      <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><i data-lucide="smartphone" class="w-5 h-5"></i></div>
+                        <div>
+                          <div class="font-medium text-slate-800">手机号</div>
+                          <div id="wb-phone-status" class="text-xs text-slate-500 mt-1">未绑定</div>
+                        </div>
+                      </div>
+                      <button type="button" id="btn-wb-change-phone" class="btn-outline px-4 py-2 rounded-lg text-sm cursor-pointer">绑定/更换手机号</button>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-4">
+                      <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><i data-lucide="message-circle" class="w-5 h-5"></i></div>
+                        <div>
+                          <div class="font-medium text-slate-800">微信号</div>
+                          <div class="text-xs text-slate-500 mt-1">已绑定（扫码登录）</div>
+                        </div>
+                      </div>
+                      <button type="button" class="btn-outline px-4 py-2 rounded-lg text-sm cursor-pointer">解除绑定</button>
+                    </div>
+
+                    <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-sm text-slate-600">
+                      <div class="font-medium text-slate-700 mb-1">登录方式</div>
+                      <p>登录弹窗默认显示「微信扫码登录」，可点击切换到「手机号短信登录」。手机号登录成功后会自动绑定到当前账号。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
+    </section>
 
-      <!-- 其他筛选 -->
-      <div class="flex flex-wrap gap-2 mb-3 text-xs">
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700">
-          城市：全国 / 北上广深杭
-        </button>
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700">
-          企业类型 / 岗位类型 / 网申时间…
-        </button>
-        <button class="btn-outline px-3 py-1.5 rounded-lg text-xs ml-auto">
-          重置
-        </button>
+    <!-- 投递看板 F6.1：非登录 / 登录非会员 / 会员 三态 -->
+    <section id="page-board" class="page">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <!-- 非登录态 -->
+        <div id="board-guest" class="rounded-xl border border-slate-200 bg-white p-12 shadow-card text-center">
+          <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-4"><i data-lucide="layout-grid" class="w-8 h-8"></i></div>
+          <p class="text-slate-600 mb-2">请先登录，登录并开通会员后可使用投递看板管理进度</p>
+          <button type="button" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer" onclick="openLoginModal()">登录</button>
+        </div>
+        <!-- 登录但未开通会员 -->
+        <div id="board-not-member" class="hidden rounded-xl border border-slate-200 bg-white p-12 shadow-card text-center">
+          <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4"><i data-lucide="lock" class="w-8 h-8"></i></div>
+          <p class="text-slate-600 mb-2">开通校招或事业编会员后，可使用投递看板与简历库</p>
+          <button type="button" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer" onclick="showPage('package')">开通会员</button>
+        </div>
+        <!-- 会员态：完整看板 -->
+        <div id="board-member" class="hidden">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <button type="button" class="nav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer active" data-view="kanban">看板</button>
+              <button type="button" class="nav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer" data-view="list">列表</button>
+              <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-28"><option>全部分组</option><option>冲刺</option><option>保底</option></select>
+            </div>
+            <button type="button" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">新增投递记录</button>
+          </div>
+          <div id="board-kanban" class="flex gap-4 overflow-x-auto pb-4">
+            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">已投递</div><div class="rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default mb-2">某公司 - 产品岗<br><span class="text-xs text-slate-400">校招表 · 2026-02-20</span></div></div>
+            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">笔试</div><div class="rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default">某单位 - 综合岗<br><span class="text-xs text-slate-400">事业编 · 2026-02-18</span></div></div>
+            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">一面</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
+            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">二面/终面</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
+            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">OC / 已拒</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
+          </div>
+          <div id="board-list" class="hidden rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card"><table class="w-full text-sm"><thead><tr class="bg-slate-50 border-b border-slate-200"><th class="text-left py-3 px-4 font-medium text-slate-700">公司</th><th class="text-left py-3 px-4 font-medium text-slate-700">岗位</th><th class="text-left py-3 px-4 font-medium text-slate-700">来源</th><th class="text-left py-3 px-4 font-medium text-slate-700">投递日期</th><th class="text-left py-3 px-4 font-medium text-slate-700">阶段</th><th class="text-left py-3 px-4 font-medium text-slate-700">操作</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-3 px-4">某公司</td><td class="py-3 px-4">产品岗</td><td class="py-3 px-4">校招表</td><td class="py-3 px-4">2026-02-20</td><td class="py-3 px-4">已投递</td><td class="py-3 px-4"><button type="button" class="btn-outline px-2 py-1 rounded text-xs cursor-pointer">编辑</button></td></tr></tbody></table></div>
+          <p class="mt-4 text-sm text-slate-500">简历库入口：<a href="#" onclick="showPage('resume'); return false;" class="text-accent-light cursor-pointer hover:underline">管理我的简历</a></p>
+        </div>
       </div>
+    </section>
 
-      <!-- 我的筛选分组（示意） -->
-      <div class="flex flex-wrap items-center gap-2 mb-4 text-xs text-slate-600">
-        <span class="font-medium">我的筛选分组：</span>
-        <button class="px-2 py-1 rounded-full border border-slate-200 bg-white">默认</button>
-        <button class="px-2 py-1 rounded-full border border-slate-200 bg-white">冲刺岗位</button>
-        <button class="px-2 py-1 rounded-full border border-slate-200 bg-white">保底岗位</button>
-        <button class="btn-outline px-3 py-1.5 rounded-full text-[11px] font-medium ml-auto">
-          保存当前筛选
-        </button>
+    <!-- 个人中心 F1.2：非登录 / 登录非会员 / 会员 三态 -->
+    <section id="page-profile" class="page">
+      <div class="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+        <!-- 非登录态 -->
+        <div id="profile-guest" class="rounded-xl border border-slate-200 bg-white p-12 shadow-card text-center">
+          <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-4"><i data-lucide="user" class="w-8 h-8"></i></div>
+          <p class="text-slate-600 mb-2">请先登录，登录后可查看个人中心、投递进度与收藏</p>
+          <button type="button" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer" onclick="openLoginModal()">登录</button>
+        </div>
+        <!-- 登录态（含非会员与会员，通过 JS 显隐区块） -->
+        <div id="profile-logged" class="hidden">
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">基本信息</div><div class="flex items-center gap-4"><div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i data-lucide="user" class="w-7 h-7"></i></div><div>微信昵称（登录后显示）</div></div></div>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">我的权益</div><p class="mb-2 text-slate-600">校招会员：<span id="profile-campus-member-text">未开通</span> <span id="profile-campus-member-btn"><button type="button" class="btn-primary ml-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer" onclick="showPage('package')">立即开通</button></span></p><p class="mb-2 text-slate-600">事业编会员：<span id="profile-career-member-text">未开通</span> <span id="profile-career-member-btn"><button type="button" class="btn-primary ml-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer" onclick="showPage('package')">立即开通</button></span></p><p class="text-slate-600 mt-2">已购资料：<a href="#" onclick="showPage('benefits'); return false;" class="text-accent-light cursor-pointer hover:underline">查看已购资料</a></p></div>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">投递概览</div><div id="profile-board-guest" class="text-slate-600"><p class="mb-2">开通校招或事业编会员后，可使用投递看板管理进度。</p><button type="button" class="btn-primary px-4 py-2 rounded-lg text-sm cursor-pointer" onclick="showPage('package')">开通会员</button></div><div id="profile-board-member" class="hidden"><p class="text-slate-600 mb-2">已投递 2 · 笔试 1 · 面试 0</p><a href="#" onclick="showPage('board'); return false;" class="text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1">进入投递看板 <i data-lucide="arrow-right" class="w-4 h-4"></i></a></div></div>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">我的简历</div><p class="text-slate-600 mb-2">会员可在简历库管理多份简历并关联投递。</p><div id="profile-resume-guest" class="text-slate-500 text-sm">开通会员后可用</div><a id="profile-resume-link" href="#" onclick="showPage('resume'); return false;" class="hidden text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1"><i data-lucide="file-text" class="w-4 h-4"></i> 管理我的简历</a></div>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">我的收藏</div><p class="text-slate-600 mb-2">校招/事业编收藏，可在对应表页「仅看收藏」筛选。</p><a href="#" onclick="showPage('campus-list'); return false;" class="text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1"><i data-lucide="star" class="w-4 h-4"></i> 去校招表</a> <a href="#" onclick="showPage('career-list'); return false;" class="text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1 ml-3">事业编表</a></div>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card"><div class="font-semibold text-slate-800 mb-4">我的订单</div><table class="w-full text-sm"><thead><tr class="border-b border-slate-200"><th class="text-left py-2 font-medium text-slate-700">订单号</th><th class="text-left py-2 font-medium text-slate-700">商品</th><th class="text-left py-2 font-medium text-slate-700">金额</th><th class="text-left py-2 font-medium text-slate-700">状态</th><th class="text-left py-2 font-medium text-slate-700">时间</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-2">ORD20260201001</td><td class="py-2">事业编会员 1年</td><td class="py-2">¥19.9</td><td class="py-2">已支付</td><td class="py-2">2026-02-01</td></tr></tbody></table></div>
+        </div>
       </div>
+    </section>
 
-      <!-- 列表表格 -->
-      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden text-xs">
-        <table class="w-full min-w-[900px]">
-          <thead class="bg-slate-50 border-b border-slate-200 text-slate-700">
-            <tr>
-              <th class="py-2 px-3 text-left">更新时间</th>
-              <th class="py-2 px-3 text-left">公司名称</th>
-              <th class="py-2 px-3 text-left">投递岗位</th>
-              <th class="py-2 px-3 text-left">工作城市</th>
-              <th class="py-2 px-3 text-left">网申时间</th>
-              <th class="py-2 px-3 text-left">毕业生要求</th>
-              <th class="py-2 px-3 text-left">浏览量</th>
-              <th class="py-2 px-3 text-left">信息来源</th>
-              <th class="py-2 px-3 text-left">投递链接</th>
-              <th class="py-2 px-3 text-left">会员操作</th>
-            </tr>
-          </thead>
-          <tbody class="text-slate-700">
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="py-2.5 px-3">2026.02.25</td>
-              <td class="py-2.5 px-3">事业单位 · 某省某单位</td>
-              <td class="py-2.5 px-3">
-                产品经理
-              </td>
-              <td class="py-2.5 px-3">合肥市</td>
-              <td class="py-2.5 px-3">2026-02-24 至 2026-11-30</td>
-              <td class="py-2.5 px-3">国内：博士及以上 / 26</td>
-              <td class="py-2.5 px-3">290</td>
-              <td class="py-2.5 px-3">官方公众号</td>
-              <td class="py-2.5 px-3">
-                <a href="#" data-action="campus-apply"
-                   class="text-primary underline-offset-2">登录后可查看 🔒</a>
-              </td>
-              <td class="py-2.5 px-3 js-campus-ops">
-                <select class="border border-slate-200 rounded px-2 py-1 text-[11px] mr-1">
-                  <option>暂无</option>
-                  <option>已投递</option>
-                  <option>笔试</option>
-                </select>
-                <button class="btn-outline px-2 py-1 rounded text-[11px] mr-1">编辑备注</button>
-                <button class="btn-outline px-2 py-1 rounded text-[11px]">公告原文</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- 会员权益 / 已购资料 F7.2 -->
+    <section id="page-benefits" class="page">
+      <div class="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+        <h2 class="text-xl font-semibold text-slate-800 mb-6">会员权益与已购资料</h2>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6">
+          <div class="font-semibold text-slate-800 mb-3">会员状态</div>
+          <p class="text-slate-600 text-sm mb-2">校招会员：解锁校招投递链接、投递看板、简历库</p>
+          <p class="text-slate-600 text-sm mb-4">事业编会员：解锁事业编报名/原文链接、投递看板</p>
+          <a href="#" onclick="showPage('package'); return false;" class="text-primary text-sm font-medium cursor-pointer">去开通 / 续费</a>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card">
+          <div class="font-semibold text-slate-800 mb-3">已购资料</div>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li class="flex items-center justify-between"><span>事业单位结构化面试资料</span><a href="#" onclick="showPage('docs-view'); return false;" class="text-accent-light cursor-pointer hover:underline">查看</a></li>
+          </ul>
+          <p class="text-slate-500 text-xs mt-3">已购资料仅支持在线预览与查看，不可编辑。</p>
+        </div>
       </div>
+    </section>
 
-      <p class="mt-3 text-[11px] text-slate-500">共 1 条，当前第 1 页（示意）</p>
+    <!-- 简历库 F6.4：非登录 / 登录非会员 / 会员 三态 -->
+    <section id="page-resume" class="page">
+      <div class="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+        <h2 class="text-xl font-semibold text-slate-800 mb-6">我的简历</h2>
+        <div id="resume-guest" class="rounded-xl border border-slate-200 bg-white p-12 shadow-card text-center hidden">
+          <p class="text-slate-600 mb-4">请先登录</p>
+          <button type="button" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer" onclick="openLoginModal()">登录</button>
+        </div>
+        <div id="resume-not-member" class="rounded-xl border border-slate-200 bg-white p-12 shadow-card text-center hidden">
+          <p class="text-slate-600 mb-4">开通校招或事业编会员后，可在此管理多份简历并关联投递记录。</p>
+          <button type="button" class="btn-primary px-6 py-2.5 rounded-lg font-medium cursor-pointer" onclick="showPage('package')">开通会员</button>
+        </div>
+        <div id="resume-member" class="hidden rounded-xl border border-slate-200 bg-white p-6 shadow-card">
+          <p class="text-slate-600 mb-4">管理多份简历，在投递看板中关联到投递记录。</p>
+          <div class="border border-slate-200 rounded-lg p-6 text-center text-slate-500 text-sm">暂无简历，可上传或创建（原型占位）</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 套餐选择 F2.2 / F7.1 -->
+    <section id="page-package" class="page">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+        <h2 class="text-xl font-semibold text-slate-800 mb-8">选择套餐</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="rounded-xl border-2 border-slate-200 bg-white p-6 transition-default hover:border-primary/50 cursor-pointer">
+            <div class="font-semibold text-slate-800 mb-2">校招会员</div><p class="text-sm text-slate-500 mb-4">解锁校招投递链接、原文链接与投递看板</p><div class="text-2xl font-bold text-primary">¥19.9<span class="text-sm font-normal text-slate-500">/年</span></div><button type="button" class="btn-primary w-full mt-4 py-2.5 rounded-lg font-medium cursor-pointer" onclick="showPage('checkout')">立即开通</button>
+          </div>
+          <div class="rounded-xl border-2 border-slate-200 bg-white p-6 transition-default hover:border-primary/50 cursor-pointer">
+            <div class="font-semibold text-slate-800 mb-2">事业编会员</div><p class="text-sm text-slate-500 mb-4">解锁事业编原文链接与投递看板</p><div class="text-2xl font-bold text-primary">¥19.9<span class="text-sm font-normal text-slate-500">/年</span></div><button type="button" class="btn-primary w-full mt-4 py-2.5 rounded-lg font-medium cursor-pointer" onclick="showPage('checkout')">立即开通</button>
+          </div>
+          <div class="rounded-xl border-2 border-primary bg-primary/5 p-6 transition-default cursor-pointer">
+            <div class="font-semibold text-slate-800 mb-2">双会员</div><p class="text-sm text-slate-500 mb-4">校招+事业编，组合优惠</p><div class="text-2xl font-bold text-primary">¥29.9<span class="text-sm font-normal text-slate-500">/年</span></div><button type="button" class="btn-primary w-full mt-4 py-2.5 rounded-lg font-medium cursor-pointer" onclick="showPage('checkout')">立即开通</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 收银台 F7.1 -->
+    <section id="page-checkout" class="page">
+      <div class="max-w-md mx-auto px-4 sm:px-6 py-10">
+        <h2 class="text-xl font-semibold text-slate-800 mb-6">收银台</h2>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card">
+          <p class="mb-3 text-slate-600">订单摘要：校招会员 1年 × 1</p>
+          <p class="mb-3 text-slate-600">优惠码：<input type="text" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-32" placeholder="输入优惠码" /> <button type="button" class="btn-outline px-3 py-2 rounded-lg text-sm cursor-pointer ml-1">使用</button></p>
+          <p class="mb-4 text-slate-600">应付金额：<strong class="text-primary text-lg">¥19.9</strong></p>
+          <p class="mb-2 text-slate-600">支付方式：</p>
+          <label class="flex items-center gap-2 mb-2 cursor-pointer"><input type="radio" name="pay" checked /> 微信支付</label>
+          <label class="flex items-center gap-2 mb-4 cursor-pointer"><input type="radio" name="pay" /> 支付宝支付</label>
+          <button type="button" class="btn-primary w-full py-2.5 rounded-lg font-medium cursor-pointer">去支付</button>
+        </div>
+      </div>
     </section>
   </main>
 
-  <!-- 登录弹窗 -->
-  <div id="modal-login"
-       class="fixed inset-0 bg-black/50 hidden items-center justify-center">
-    <div class="bg-white rounded-2xl p-6 w-[320px] text-center shadow-lg">
-      <div class="font-semibold text-slate-800 mb-2 text-base">微信一扫，立即登录</div>
-      <p class="text-xs text-slate-500 mb-3">关注公众号后自动完成登录与注册</p>
-      <div class="w-40 h-40 mx-auto mb-3 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 text-xs">
-        二维码占位
+  <!-- 登录弹窗 F1.1 -->
+  <div id="modal-login" class="fixed inset-0 z-[200] bg-black/50 hidden items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl p-6 sm:p-8 w-[360px] shadow-xl relative">
+      <div class="flex items-center justify-between mb-4">
+        <div class="font-semibold text-slate-800 text-base">登录</div>
+        <button type="button" class="p-1 rounded-lg hover:bg-slate-100 cursor-pointer" onclick="closeModal('modal-login')"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
       </div>
-      <p class="text-[11px] text-slate-500 mb-3">
-        请使用微信扫描二维码，关注「Offer信息站」公众号后返回本页。
-      </p>
-      <p class="text-[10px] text-rose-500 mb-4">
-        登录即代表同意《用户协议》和《隐私政策》
-      </p>
-      <div class="flex gap-2">
-        <button class="btn-outline flex-1 py-1.5 rounded-lg text-xs"
-                onclick="closeModal('modal-login')">关闭</button>
-        <button class="btn-primary flex-1 py-1.5 rounded-lg text-xs"
-                onclick="simulateLoginSuccess()">模拟扫码成功</button>
+
+      <!-- 登录方式切换 -->
+      <div class="flex gap-2 mb-5">
+        <button type="button" id="tab-login-wechat" class="flex-1 btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer active">微信扫码登录</button>
+        <button type="button" id="tab-login-sms" class="flex-1 btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer">手机号短信登录</button>
+      </div>
+
+      <!-- 微信扫码（默认） -->
+      <div id="login-panel-wechat">
+        <p class="text-xs text-slate-500 mb-4">默认推荐：关注公众号后自动完成登录与注册</p>
+        <div class="w-48 h-48 mx-auto mb-4 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+          <span class="text-xs">二维码占位</span>
+        </div>
+        <p class="text-xs text-slate-500 mb-3 text-center">请使用微信扫描二维码，关注「Offer信息站」公众号后返回本页</p>
+        <button type="button" class="btn-primary w-full py-2.5 rounded-lg font-medium cursor-pointer" onclick="simulateLoginSuccess()">模拟扫码成功</button>
+      </div>
+
+      <!-- 手机号短信 -->
+      <div id="login-panel-sms" class="hidden">
+        <p class="text-xs text-slate-500 mb-4">使用手机号短信验证码登录（登录后将绑定到当前账号）</p>
+        <label class="block text-sm text-slate-700 mb-1">手机号</label>
+        <input type="text" id="login-phone" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm mb-3" placeholder="请输入手机号" />
+        <label class="block text-sm text-slate-700 mb-1">验证码</label>
+        <div class="flex gap-2 mb-4">
+          <input type="text" id="login-sms-code" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm" placeholder="请输入验证码" />
+          <button type="button" id="btn-send-sms" class="btn-outline px-3 py-2 rounded-lg text-sm cursor-pointer whitespace-nowrap">发送验证码</button>
+        </div>
+        <button type="button" id="btn-sms-login" class="btn-primary w-full py-2.5 rounded-lg font-medium cursor-pointer">登录</button>
+      </div>
+
+      <p class="text-[11px] text-red-500 mt-5">登录即代表同意《用户协议》和《隐私政策》</p>
+    </div>
+  </div>
+
+  <!-- 资料购买弹窗（简化版，参考淘宝） -->
+  <div id="modal-doc-pay" class="fixed inset-0 z-[220] bg-black/50 hidden items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl p-6 w-[360px] shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <div class="font-semibold text-slate-800">确认购买</div>
+        <button type="button" class="p-1 rounded-lg hover:bg-slate-100 cursor-pointer" onclick="closeModal('modal-doc-pay')"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+      </div>
+      <p id="doc-pay-title" class="text-sm text-slate-700 mb-3">事业单位结构化面试资料</p>
+      <p class="text-slate-600 mb-4">价格：<strong id="doc-pay-price" class="text-primary">¥9.9</strong></p>
+      <div class="text-sm text-slate-600 mb-4">
+        <div class="font-medium text-slate-700 mb-2">支付方式</div>
+        <label class="flex items-center gap-2 mb-2 cursor-pointer"><input type="radio" name="docPay" checked /> 微信支付</label>
+        <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="docPay" /> 支付宝支付</label>
+      </div>
+      <button type="button" id="btn-doc-confirm-pay" class="btn-primary w-full py-2.5 rounded-lg font-medium cursor-pointer">确认支付</button>
+      <p class="text-xs text-slate-400 mt-3">支付成功后，可在「面试资料 → 我的资料」查看。</p>
+    </div>
+  </div>
+
+  <!-- 权益弹窗 F2.2 -->
+  <div id="modal-paywall" class="fixed inset-0 z-[200] bg-black/50 hidden items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl p-8 w-[360px] shadow-xl">
+      <div class="font-semibold text-slate-800 mb-3">开通会员解锁投递链接</div>
+      <p class="text-sm text-slate-500 mb-6">会员可查看投递链接、原文链接，并使用投递看板与简历管理。</p>
+      <div class="flex gap-3 justify-end">
+        <button type="button" class="btn-outline px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-paywall')">稍后再说</button>
+        <button type="button" class="btn-primary px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-paywall'); showPage('package');">19.9/年 立即开通</button>
       </div>
     </div>
   </div>
 
-  <!-- 权益弹窗 -->
-  <div id="modal-paywall"
-       class="fixed inset-0 bg-black/50 hidden items-center justify-center">
-    <div class="bg-white rounded-2xl p-6 w-[340px] shadow-lg text-sm">
-      <div class="font-semibold text-slate-800 mb-2">开通校招会员解锁投递链接</div>
-      <p class="text-slate-500 mb-4">
-        会员可查看投递链接 / 原文链接，并使用投递看板与简历库管理投递进度。
-      </p>
-      <div class="flex justify-end gap-2">
-        <button class="btn-outline px-3 py-1.5 rounded-lg text-xs"
-                onclick="closeModal('modal-paywall')">稍后再说</button>
-        <button class="btn-primary px-3 py-1.5 rounded-lg text-xs"
-                onclick="closeModal('modal-paywall'); showPage('home'); alert('跳转到会员开通页（示意）');">
-          19.9/年 立即开通
-        </button>
+  <!-- 保存筛选分组弹窗 F3.4 -->
+  <div id="modal-save-filter" class="fixed inset-0 z-[200] bg-black/50 hidden items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl p-6 w-[400px] shadow-xl">
+      <div class="font-semibold text-slate-800 mb-3">保存当前筛选</div>
+      <p class="text-xs text-slate-500 mb-2">当前条件摘要：</p>
+      <div id="save-filter-summary" class="text-sm text-slate-600 mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">招聘类型、行业、城市、企业类型、网申截止、关键词（原型占位）</div>
+      <label class="block text-sm text-slate-700 mb-1">分组名称 <span class="text-red-500">*</span></label>
+      <input type="text" id="save-filter-name" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm mb-4" placeholder="如：广州产品岗" />
+      <div class="flex gap-3 justify-end">
+        <button type="button" class="btn-outline px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-save-filter')">取消</button>
+        <button type="button" class="btn-primary px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-save-filter'); alert('模拟：已保存筛选分组');">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 已投递时填写投递岗位 F3.6 -->
+  <div id="modal-applied-job" class="fixed inset-0 z-[200] bg-black/50 hidden items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl p-6 w-[360px] shadow-xl">
+      <div class="font-semibold text-slate-800 mb-2">填写投递岗位</div>
+      <p class="text-xs text-slate-500 mb-3">您在该企业实际投递的岗位名称（可与列表岗位不一致，便于在个人中心区分）</p>
+      <input type="text" id="input-applied-job" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm mb-4" placeholder="如：产品经理-校招" />
+      <div class="flex gap-3 justify-end">
+        <button type="button" class="btn-outline px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-applied-job')">取消</button>
+        <button type="button" class="btn-primary px-4 py-2 rounded-lg cursor-pointer" id="btn-confirm-applied-job">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑备注弹窗 F3.6 -->
+  <div id="modal-remark" class="fixed inset-0 z-[200] bg-black/50 hidden items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl p-6 w-[400px] shadow-xl">
+      <div class="font-semibold text-slate-800 mb-2">编辑备注</div>
+      <p class="text-xs text-slate-500 mb-2">记录您对该企业/岗位的备注信息（仅自己可见）</p>
+      <textarea id="input-remark" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm min-h-[100px] resize-y" placeholder="如：笔试在 3 月 10 日，需带身份证"></textarea>
+      <div class="flex gap-3 justify-end mt-4">
+        <button type="button" class="btn-outline px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-remark')">取消</button>
+        <button type="button" class="btn-primary px-4 py-2 rounded-lg cursor-pointer" id="btn-confirm-remark">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 筛选「更多」弹窗占位 F3.3 -->
+  <div id="modal-filter-more" class="fixed inset-0 z-[200] bg-black/50 hidden items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl p-6 w-[360px] max-h-[80vh] overflow-hidden flex flex-col shadow-xl">
+      <div class="font-semibold text-slate-800 mb-3" id="modal-filter-more-title">更多选项</div>
+      <div class="flex flex-wrap gap-2 mb-4 overflow-y-auto" id="modal-filter-more-options"></div>
+      <div class="flex gap-3 justify-end shrink-0">
+        <button type="button" class="btn-outline px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-filter-more')">取消</button>
+        <button type="button" class="btn-primary px-4 py-2 rounded-lg cursor-pointer" onclick="closeModal('modal-filter-more')">确定</button>
       </div>
     </div>
   </div>
 
   <script>
-    // 状态模拟：登录 + 校招会员
+    lucide.createIcons();
+
+    // 简单状态模拟：登录 + 校招/事业编会员
     var isLoggedIn = false;
     var hasCampusMember = false;
+    var hasCareerMember = false;
+    var phoneBound = false;
+    var loginMethod = 'wechat'; // wechat | sms
+    var currentPayDocId = null;
+    var currentDocIdInView = '2'; // 当前阅读器打开的资料 ID，用于控制购买遮罩
+    var purchasedDocs = { '2': true }; // 原型：2 已购
+    var pendingAfterLogin = null; // 'package' 表示登录成功后跳转套餐页（从校招页 CTA 或投递/操作区进入登录时设置）
 
-    function openLogin() {
-      document.getElementById('modal-login').classList.remove('hidden');
-      document.getElementById('modal-login').classList.add('flex');
+    var workbenchTab = 'board';
+
+    function openWorkbench(tab) {
+      if (!isLoggedIn) { openLoginModal(true); return; }
+      workbenchTab = tab || 'board';
+      showPage('workbench');
+      updateUI();
+    }
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(function(el) { el.classList.remove('active'); });
+      var page = document.getElementById('page-' + id);
+      if (page) page.classList.add('active');
+      var navPage = (id === 'career-detail') ? 'career-list' : (id === 'benefits' || id === 'resume' || id === 'docs-view' || id === 'workbench') ? null : id;
+      document.querySelectorAll('.nav-item').forEach(function(el) {
+        el.classList.toggle('active', navPage && el.getAttribute('data-page') === navPage);
+      });
+      closeHeaderDropdown();
+      var needIcons = ['campus-list', 'career-list', 'career-detail', 'profile', 'board', 'docs', 'docs-view', 'benefits', 'resume', 'workbench'];
+      if (needIcons.indexOf(id) !== -1 && typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function openLoginModal(fromCampus) {
+      if (fromCampus) pendingAfterLogin = 'package';
+      setLoginMethod('wechat');
+      document.getElementById('modal-login').style.display = 'flex';
     }
 
     function simulateLoginSuccess() {
       isLoggedIn = true;
+      phoneBound = phoneBound || false;
       closeModal('modal-login');
-      updateCampusUI();
+      updateUI();
+      if (pendingAfterLogin === 'package') {
+        pendingAfterLogin = null;
+        showPage('package');
+      }
     }
 
-    function openPaywall() {
-      document.getElementById('modal-paywall').classList.remove('hidden');
-      document.getElementById('modal-paywall').classList.add('flex');
+    function setLoginMethod(method) {
+      loginMethod = method;
+      var tabWechat = document.getElementById('tab-login-wechat');
+      var tabSms = document.getElementById('tab-login-sms');
+      var panelWechat = document.getElementById('login-panel-wechat');
+      var panelSms = document.getElementById('login-panel-sms');
+      if (tabWechat && tabSms && panelWechat && panelSms) {
+        var isWechat = method === 'wechat';
+        tabWechat.classList.toggle('active', isWechat);
+        tabSms.classList.toggle('active', !isWechat);
+        panelWechat.classList.toggle('hidden', !isWechat);
+        panelSms.classList.toggle('hidden', isWechat);
+      }
+    }
+
+    function simulateSmsLogin() {
+      var phone = (document.getElementById('login-phone') && document.getElementById('login-phone').value || '').trim();
+      var code = (document.getElementById('login-sms-code') && document.getElementById('login-sms-code').value || '').trim();
+      if (!phone) { alert('请输入手机号'); return; }
+      if (!code) { alert('请输入验证码'); return; }
+      isLoggedIn = true;
+      phoneBound = true;
+      closeModal('modal-login');
+      updateUI();
+    }
+
+    function handleCampusApplyClick() {
+      if (!isLoggedIn) { openLoginModal(true); return; }
+      if (!hasCampusMember) { showPage('package'); return; }
+      alert('模拟：新开标签打开投递链接（仅跳转第三方，投递记录需在操作专区标记进度）');
+    }
+
+    function handleCampusOriginalClick(e) {
+      e.preventDefault();
+      if (!isLoggedIn) { openLoginModal(true); return; }
+      if (!hasCampusMember) { showPage('package'); return; }
+      alert('模拟：新开标签打开公告原文链接');
+    }
+
+    function requireCampusAuth() {
+      if (!isLoggedIn) { openLoginModal(true); return false; }
+      if (!hasCampusMember) { showPage('package'); return false; }
+      return true;
+    }
+
+    function handleCareerOriginalClick() {
+      if (!isLoggedIn) {
+        openLoginModal();
+        return;
+      }
+      if (!hasCareerMember) {
+        openPaywall('career');
+        return;
+      }
+      alert('模拟：已是事业编会员，打开原文链接并可写入投递记录');
+    }
+
+    function closeHeaderDropdown() {
+      var dd = document.getElementById('header-user-dropdown');
+      if (dd) dd.classList.add('hidden');
+    }
+
+    function updateUI() {
+      var btnLogin = document.getElementById('btnLogin');
+      var headerGuest = document.getElementById('header-guest');
+      var headerUser = document.getElementById('header-user');
+      if (!btnLogin) return;
+      if (!isLoggedIn) {
+        headerGuest && headerGuest.classList.remove('hidden');
+        headerUser && headerUser.classList.add('hidden');
+        btnLogin.textContent = '求职者登录';
+        btnLogin.onclick = function () { openLoginModal(); };
+      } else {
+        headerGuest && headerGuest.classList.add('hidden');
+        headerUser && headerUser.classList.remove('hidden');
+        btnLogin.textContent = '求职者登录';
+        // 会员状态卡片：有校招或事业编会员则显示「已开通」
+        var memberNot = document.getElementById('header-member-not');
+        var memberYes = document.getElementById('header-member-yes');
+        if (memberNot && memberYes) {
+          if (hasCampusMember || hasCareerMember) {
+            memberNot.classList.add('hidden');
+            memberYes.classList.remove('hidden');
+          } else {
+            memberNot.classList.remove('hidden');
+            memberYes.classList.add('hidden');
+          }
+        }
+      }
+
+      // 工作台账号设置：手机号绑定态
+      var wbPhoneStatus = document.getElementById('wb-phone-status');
+      if (wbPhoneStatus) wbPhoneStatus.textContent = phoneBound ? '已绑定手机号：134****9810' : '未绑定';
+
+      // 面试资料：已购角标 + 阅读器遮罩（按当前打开的资料 ID 判断）+ 下载按钮文案
+      var badge2 = document.querySelector('.js-doc-badge-2');
+      if (badge2) badge2.classList.toggle('hidden', !purchasedDocs['2']);
+      var paywall = document.getElementById('docs-paywall');
+      if (paywall) {
+        var docId = currentDocIdInView || '2';
+        paywall.classList.toggle('hidden', !!purchasedDocs[docId]);
+      }
+      var btnDocDownload = document.getElementById('btn-doc-download');
+      if (btnDocDownload) {
+        var curId = currentDocIdInView || '2';
+        var purchased = !!purchasedDocs[curId];
+        btnDocDownload.textContent = purchased ? '下载 PDF（含个人水印）' : '购买后可下载 PDF（含个人水印）';
+        btnDocDownload.disabled = false; // 原型不做禁用，只通过文案引导
+      }
+
+      // 校招投递链接文案与锁图标（操作列内）
+      document.querySelectorAll('[data-action="campus-apply"]').forEach(function (el) {
+        var textEl = el.querySelector('.js-apply-text');
+        var lockEl = el.querySelector('.js-lock-icon');
+        if (textEl) {
+          if (!isLoggedIn) {
+            textEl.textContent = '登录后可查看';
+            if (lockEl) { lockEl.style.display = ''; }
+          } else if (!hasCampusMember) {
+            textEl.textContent = '开通会员解锁';
+            if (lockEl) { lockEl.style.display = ''; }
+          } else {
+            textEl.textContent = '点击投递';
+            if (lockEl) { lockEl.style.display = 'none'; }
+          }
+        }
+      });
+      // 校招操作专区：未登录/未开会员时禁用，点击弹登录或跳转套餐
+      document.querySelectorAll('.js-campus-ops').forEach(function (cell) {
+        var stageSelect = cell.querySelector('.js-stage-select');
+        var remarkBtn = cell.querySelector('.js-remark-btn');
+        if (!isLoggedIn || !hasCampusMember) {
+          if (stageSelect) { stageSelect.disabled = true; stageSelect.classList.add('opacity-50', 'cursor-not-allowed'); }
+          if (remarkBtn) { remarkBtn.disabled = true; remarkBtn.classList.add('opacity-50', 'cursor-not-allowed'); }
+          cell.style.cursor = 'pointer';
+          cell.onclick = function (e) {
+            if (e.target.closest('a') || e.target.closest('.js-campus-fav')) return;
+            if (!isLoggedIn) openLoginModal(true);
+            else showPage('package');
+          };
+        } else {
+          if (stageSelect) { stageSelect.disabled = false; stageSelect.classList.remove('opacity-50', 'cursor-not-allowed'); stageSelect.onclick = function (e) { e.stopPropagation(); }; }
+          if (remarkBtn) { remarkBtn.disabled = false; remarkBtn.classList.remove('opacity-50', 'cursor-not-allowed'); remarkBtn.onclick = function (e) { e.stopPropagation(); }; }
+          cell.onclick = null;
+          cell.style.cursor = '';
+        }
+      });
+      hasCareerMember = (document.getElementById('chk-simulate-career-member') && document.getElementById('chk-simulate-career-member').checked);
+      document.querySelectorAll('[data-action="career-original"]').forEach(function (el) {
+        var lockIcon = el.querySelector('.js-career-lock-icon');
+        var textEl = el.querySelector('.js-career-link-text');
+        if (textEl) {
+          if (!isLoggedIn) {
+            textEl.textContent = '登录后可查看 🔒';
+            if (lockIcon) lockIcon.style.display = '';
+          } else if (!hasCareerMember) {
+            textEl.textContent = '开通会员解锁 🔒';
+            if (lockIcon) lockIcon.style.display = '';
+          } else {
+            textEl.textContent = '原文链接';
+            if (lockIcon) lockIcon.style.display = 'none';
+          }
+        }
+      });
+      var careerDetailLinkBtn = document.querySelector('#page-career-detail [data-action="career-original"]');
+      var careerDetailLockHint = document.querySelector('#page-career-detail .js-career-detail-link-lock');
+      if (careerDetailLinkBtn && careerDetailLockHint) {
+        if (isLoggedIn && hasCareerMember) {
+          careerDetailLinkBtn.classList.remove('hidden');
+          careerDetailLockHint.classList.add('hidden');
+        } else {
+          careerDetailLinkBtn.classList.add('hidden');
+          careerDetailLockHint.classList.remove('hidden');
+        }
+      }
+      // 事业编会员引导条
+      var careerBannerCta = document.getElementById('career-banner-cta');
+      var careerBannerMember = document.getElementById('career-banner-member');
+      var btnCareerOpen = document.getElementById('btn-career-open-member');
+      if (careerBannerCta && careerBannerMember && btnCareerOpen) {
+        if (hasCareerMember) {
+          careerBannerCta.classList.add('hidden');
+          careerBannerMember.classList.remove('hidden');
+        } else {
+          careerBannerCta.classList.remove('hidden');
+          careerBannerMember.classList.add('hidden');
+          btnCareerOpen.onclick = function () {
+            if (!isLoggedIn) openLoginModal(true);
+            else showPage('package');
+          };
+        }
+      }
+      // 事业编操作专区：未登录/未开会员时禁用
+      document.querySelectorAll('.js-career-ops').forEach(function (cell) {
+        var stageSelect = cell.querySelector('.js-career-stage-select');
+        var remarkBtn = cell.querySelector('.js-career-remark-btn');
+        if (!isLoggedIn || !hasCareerMember) {
+          if (stageSelect) { stageSelect.disabled = true; stageSelect.classList.add('opacity-50', 'cursor-not-allowed'); }
+          if (remarkBtn) { remarkBtn.disabled = true; remarkBtn.classList.add('opacity-50', 'cursor-not-allowed'); }
+          cell.style.cursor = 'pointer';
+          cell.onclick = function (e) {
+            if (e.target.closest('a') || e.target.closest('.js-career-fav') || e.target.closest('.js-career-detail-link')) return;
+            if (!isLoggedIn) openLoginModal(true);
+            else showPage('package');
+          };
+        } else {
+          if (stageSelect) { stageSelect.disabled = false; stageSelect.classList.remove('opacity-50', 'cursor-not-allowed'); stageSelect.onclick = function (e) { e.stopPropagation(); }; }
+          if (remarkBtn) { remarkBtn.disabled = false; remarkBtn.classList.remove('opacity-50', 'cursor-not-allowed'); remarkBtn.onclick = function (e) { e.stopPropagation(); }; }
+          cell.onclick = null;
+          cell.style.cursor = '';
+        }
+      });
+      document.querySelectorAll('.js-career-fav').forEach(function (btn) {
+        if (!isLoggedIn) {
+          btn.onclick = function (e) { e.preventDefault(); openLoginModal(); };
+        } else {
+          btn.onclick = function (e) { e.preventDefault(); alert('模拟：收藏/取消收藏'); };
+        }
+      });
+
+      // 个人中心三态：非登录 / 登录 / 会员
+      var profileGuest = document.getElementById('profile-guest');
+      var profileLogged = document.getElementById('profile-logged');
+      if (profileGuest && profileLogged) {
+        if (!isLoggedIn) {
+          profileGuest.classList.remove('hidden');
+          profileLogged.classList.add('hidden');
+        } else {
+          profileGuest.classList.add('hidden');
+          profileLogged.classList.remove('hidden');
+          var t1 = document.getElementById('profile-campus-member-text');
+          var t2 = document.getElementById('profile-career-member-text');
+          var b1 = document.getElementById('profile-campus-member-btn');
+          var b2 = document.getElementById('profile-career-member-btn');
+          if (t1) t1.textContent = hasCampusMember ? '已开通（到期日 2026-12-31）' : '未开通';
+          if (t2) t2.textContent = hasCareerMember ? '已开通（到期日 2026-12-31）' : '未开通';
+          if (b1) b1.style.display = hasCampusMember ? 'none' : '';
+          if (b2) b2.style.display = hasCareerMember ? 'none' : '';
+          var boardGuest = document.getElementById('profile-board-guest');
+          var boardMember = document.getElementById('profile-board-member');
+          if (boardGuest && boardMember) {
+            if (hasCampusMember || hasCareerMember) { boardGuest.classList.add('hidden'); boardMember.classList.remove('hidden'); }
+            else { boardGuest.classList.remove('hidden'); boardMember.classList.add('hidden'); }
+          }
+          var resumeLink = document.getElementById('profile-resume-link');
+          var resumeGuest = document.getElementById('profile-resume-guest');
+          if (resumeLink && resumeGuest) {
+            if (hasCampusMember || hasCareerMember) { resumeLink.classList.remove('hidden'); resumeGuest.classList.add('hidden'); }
+            else { resumeLink.classList.add('hidden'); resumeGuest.classList.remove('hidden'); }
+          }
+        }
+      }
+
+      // 投递看板三态
+      var boardGuest = document.getElementById('board-guest');
+      var boardNotMember = document.getElementById('board-not-member');
+      var boardMember = document.getElementById('board-member');
+      if (boardGuest && boardNotMember && boardMember) {
+        boardGuest.classList.add('hidden');
+        boardNotMember.classList.add('hidden');
+        boardMember.classList.add('hidden');
+        if (!isLoggedIn) boardGuest.classList.remove('hidden');
+        else if (!hasCampusMember && !hasCareerMember) boardNotMember.classList.remove('hidden');
+        else boardMember.classList.remove('hidden');
+      }
+
+      // 简历库三态
+      var resumeGuest = document.getElementById('resume-guest');
+      var resumeNotMember = document.getElementById('resume-not-member');
+      var resumeMember = document.getElementById('resume-member');
+      if (resumeGuest && resumeNotMember && resumeMember) {
+        resumeGuest.classList.add('hidden');
+        resumeNotMember.classList.add('hidden');
+        resumeMember.classList.add('hidden');
+        if (!isLoggedIn) resumeGuest.classList.remove('hidden');
+        else if (!hasCampusMember && !hasCareerMember) resumeNotMember.classList.remove('hidden');
+        else resumeMember.classList.remove('hidden');
+      }
+
+      // 工作台：三态 + 左侧栏 Tab + 权限
+      var wbGuest = document.getElementById('wb-guest');
+      var wbLogged = document.getElementById('wb-logged');
+      if (wbGuest && wbLogged) {
+        if (!isLoggedIn) {
+          wbGuest.classList.remove('hidden');
+          wbLogged.classList.add('hidden');
+        } else {
+          wbGuest.classList.add('hidden');
+          wbLogged.classList.remove('hidden');
+          // 切换视图（关注企业已移除，fallback 到 board）
+          var tab = workbenchTab || 'board';
+          if (tab === 'follow') tab = 'board';
+          document.querySelectorAll('#page-workbench .wb-view').forEach(function (v) { v.classList.add('hidden'); });
+          var viewId = 'wb-view-' + tab;
+          var view = document.getElementById(viewId);
+          if (view) view.classList.remove('hidden');
+          // 左侧栏选中态
+          document.querySelectorAll('#page-workbench .wb-nav-item').forEach(function (b) {
+            var active = b.getAttribute('data-wb') === tab;
+            b.classList.toggle('bg-primary/10', active);
+            b.classList.toggle('text-primary', active);
+            b.classList.toggle('font-medium', active);
+          });
+          // 简历：附件简历会员解锁
+          var attachLocked = document.getElementById('wb-attach-locked');
+          var attachOpen = document.getElementById('wb-attach-open');
+          if (attachLocked && attachOpen) {
+            if (hasCampusMember || hasCareerMember) {
+              attachLocked.classList.add('hidden');
+              attachOpen.classList.remove('hidden');
+            } else {
+              attachLocked.classList.remove('hidden');
+              attachOpen.classList.add('hidden');
+            }
+          }
+
+          // 投递看板：非会员显示 CTA（看板仍可展示占位卡片）
+          var wbBoardCta = document.getElementById('wb-board-cta');
+          if (wbBoardCta) wbBoardCta.classList.toggle('hidden', (hasCampusMember || hasCareerMember));
+        }
+      }
+
+      // 校招页：会员引导条显隐与按钮
+      var bannerCta = document.getElementById('campus-banner-cta');
+      var bannerMember = document.getElementById('campus-banner-member');
+      var btnCampusOpen = document.getElementById('btn-campus-open-member');
+      if (bannerCta && bannerMember && btnCampusOpen) {
+        if (hasCampusMember) {
+          bannerCta.classList.add('hidden');
+          bannerMember.classList.remove('hidden');
+        } else {
+          bannerCta.classList.remove('hidden');
+          bannerMember.classList.add('hidden');
+          btnCampusOpen.onclick = function () {
+            if (!isLoggedIn) openLoginModal(true);
+            else showPage('package');
+          };
+        }
+      }
+      // 首行筛选（求职进度、分组、仅看收藏）全员可见，不在此处显隐
+      // 模拟已开通校招会员：复选框驱动 hasCampusMember
+      var chkSim = document.getElementById('chk-simulate-campus-member');
+      if (chkSim) {
+        hasCampusMember = chkSim.checked;
+      }
+      // 收藏按钮：未登录时点击弹登录（不强制跳转套餐）
+      document.querySelectorAll('.js-campus-fav').forEach(function (btn) {
+        if (!isLoggedIn) {
+          btn.classList.add('opacity-50', 'cursor-pointer');
+          btn.onclick = function (e) { e.preventDefault(); openLoginModal(); };
+        } else {
+          btn.classList.remove('opacity-50');
+          btn.onclick = function (e) { e.preventDefault(); alert('模拟：收藏/取消收藏'); };
+        }
+      });
     }
 
     function closeModal(id) {
-      var m = document.getElementById(id);
-      m.classList.add('hidden');
-      m.classList.remove('flex');
+      document.getElementById(id).style.display = 'none';
     }
 
-    // 校招页三种状态 UI
-    function updateCampusUI() {
-      var btnLogin = document.getElementById('btnLogin');
-      if (isLoggedIn) {
-        btnLogin.textContent = hasCampusMember ? '校招会员（模拟）' : '已登录（模拟）';
-      } else {
-        btnLogin.textContent = '求职者登录';
-      }
+    function openPaywall(type) {
+      // type 可为 'campus' 或 'career'，当前原型仅展示同一份文案
+      document.getElementById('modal-paywall').style.display = 'flex';
+    }
 
-      // 引导条文案
-      var banner = document.getElementById('campus-banner');
-      var text = document.getElementById('campus-banner-text');
-      var btn = document.getElementById('campus-banner-btn');
-      if (!isLoggedIn) {
-        banner.classList.remove('hidden');
-        text.textContent = '当前为未登录访客，仅可浏览基础信息；登录并开通校招会员后可解锁投递链接、投递看板与简历库。';
-        btn.textContent = '登录并开通校招会员';
-      } else if (isLoggedIn && !hasCampusMember) {
-        banner.classList.remove('hidden');
-        text.textContent = '已登录，尚未开通校招会员：开通后可解锁投递链接与原文链接，并使用投递看板。';
-        btn.textContent = '开通校招会员';
-      } else {
-        // 已是校招会员，可以隐藏或改为弱提示
-        banner.classList.add('hidden');
-      }
+    document.querySelectorAll('.nav-item').forEach(function(el) {
+      el.addEventListener('click', function() { showPage(this.getAttribute('data-page')); });
+    });
 
-      // 列表里投递链接文案 + 会员操作区是否可用
-      var applyLinks = document.querySelectorAll('[data-action="campus-apply"]');
-      var opsCells = document.querySelectorAll('.js-campus-ops');
+    document.getElementById('btnLogin').addEventListener('click', function() {
+      openLoginModal();
+    });
 
-      applyLinks.forEach(function (a) {
-        if (!isLoggedIn) a.textContent = '登录后可查看 🔒';
-        else if (!hasCampusMember) a.textContent = '开通会员解锁 🔒';
-        else a.textContent = '点击投递';
+    // 登录方式切换：默认微信扫码，可切换短信
+    document.getElementById('tab-login-wechat') && document.getElementById('tab-login-wechat').addEventListener('click', function () { setLoginMethod('wechat'); });
+    document.getElementById('tab-login-sms') && document.getElementById('tab-login-sms').addEventListener('click', function () { setLoginMethod('sms'); });
+    document.getElementById('btn-send-sms') && document.getElementById('btn-send-sms').addEventListener('click', function () { alert('模拟：短信验证码已发送'); });
+    document.getElementById('btn-sms-login') && document.getElementById('btn-sms-login').addEventListener('click', function () { simulateSmsLogin(); });
+
+    document.getElementById('btn-user-menu') && document.getElementById('btn-user-menu').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.getElementById('header-user-dropdown').classList.toggle('hidden');
+    });
+    document.addEventListener('click', function() { closeHeaderDropdown(); });
+    document.getElementById('header-user-dropdown') && document.getElementById('header-user-dropdown').addEventListener('click', function(e) { e.stopPropagation(); });
+    document.getElementById('btn-logout') && document.getElementById('btn-logout').addEventListener('click', function() {
+      isLoggedIn = false;
+      hasCampusMember = false;
+      hasCareerMember = false;
+      phoneBound = false;
+      document.getElementById('chk-simulate-campus-member') && (document.getElementById('chk-simulate-campus-member').checked = false);
+      document.getElementById('chk-simulate-career-member') && (document.getElementById('chk-simulate-career-member').checked = false);
+      workbenchTab = 'board';
+      updateUI();
+      showPage('home');
+    });
+
+    // 工作台：左侧栏切换
+    document.querySelectorAll('#page-workbench .wb-nav-item').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (!isLoggedIn) { openLoginModal(true); return; }
+        workbenchTab = this.getAttribute('data-wb') || 'board';
+        updateUI();
       });
+    });
 
-      opsCells.forEach(function (cell) {
-        var ctrls = cell.querySelectorAll('button, select');
-        ctrls.forEach(function (c) {
-          if (!isLoggedIn || !hasCampusMember) {
-            c.disabled = true;
-            c.classList.add('opacity-50', 'cursor-not-allowed');
-          } else {
-            c.disabled = false;
-            c.classList.remove('opacity-50', 'cursor-not-allowed');
-          }
+    // 工作台：收藏 Tab
+    document.querySelectorAll('#page-workbench .wb-fav-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var tab = this.getAttribute('data-favtab');
+        document.querySelectorAll('#page-workbench .wb-fav-tab').forEach(function (b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById('wb-fav-campus') && document.getElementById('wb-fav-campus').classList.toggle('hidden', tab !== 'campus');
+        document.getElementById('wb-fav-career') && document.getElementById('wb-fav-career').classList.toggle('hidden', tab !== 'career');
+      });
+    });
+
+    // 工作台：收藏跳转
+    document.querySelectorAll('.js-wb-go-campus-detail').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        showPage('campus-list');
+        alert('模拟：已跳转到校招表并定位到该岗位');
+      });
+    });
+    document.querySelectorAll('.js-wb-go-career-detail').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        showPage('career-detail');
+      });
+    });
+
+    // 工作台：账号设置 → 绑定/更换手机号（打开短信登录面板）
+    document.getElementById('btn-wb-change-phone') && document.getElementById('btn-wb-change-phone').addEventListener('click', function () {
+      openLoginModal(true);
+      setLoginMethod('sms');
+    });
+
+    // 工作台：投递卡片跳转（区分来源）
+    document.querySelectorAll('.js-wb-apply-card').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var src = this.getAttribute('data-source');
+        if (src === 'career') {
+          showPage('career-detail');
+          return;
+        }
+        if (src === 'campus') {
+          showPage('campus-list');
+          alert('模拟：跳转到校招表岗位详情（可定位到该岗位）');
+        }
+      });
+    });
+
+    // 资料购买：打开支付弹窗 & 支付成功
+    function openDocPay(docId, title, price) {
+      currentPayDocId = String(docId);
+      document.getElementById('doc-pay-title') && (document.getElementById('doc-pay-title').textContent = title || '面试资料');
+      document.getElementById('doc-pay-price') && (document.getElementById('doc-pay-price').textContent = price || '¥9.9');
+      document.getElementById('modal-doc-pay').style.display = 'flex';
+    }
+    document.getElementById('btn-doc-confirm-pay') && document.getElementById('btn-doc-confirm-pay').addEventListener('click', function () {
+      if (!currentPayDocId) return;
+      purchasedDocs[currentPayDocId] = true;
+      closeModal('modal-doc-pay');
+      alert('模拟：支付成功，已解锁资料');
+      updateUI();
+    });
+
+    document.querySelectorAll('#modal-login, #modal-paywall, #modal-save-filter, #modal-filter-more, #modal-applied-job, #modal-remark, #modal-doc-pay').forEach(function(modal) {
+      modal.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+    });
+
+    document.querySelectorAll('.nav-tab').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var v = this.getAttribute('data-view');
+        document.querySelectorAll('.nav-tab').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById('board-kanban').classList.toggle('hidden', v !== 'kanban');
+        document.getElementById('board-list').classList.toggle('hidden', v !== 'list');
+      });
+    });
+
+    // 校招页：模拟已开通校招会员复选框
+    document.getElementById('chk-simulate-campus-member') && document.getElementById('chk-simulate-campus-member').addEventListener('change', function () {
+      hasCampusMember = this.checked;
+      updateUI();
+    });
+
+    // 校招页：筛选展开/收起（默认收起，表格首屏可见）
+    document.getElementById('btn-campus-filter-toggle') && document.getElementById('btn-campus-filter-toggle').addEventListener('click', function () {
+      var area = document.getElementById('campus-filter-expand');
+      var chevron = document.querySelector('#page-campus-list .js-filter-chevron');
+      if (!area) return;
+      var isOpen = !area.classList.contains('hidden');
+      area.classList.toggle('hidden', isOpen);
+      if (chevron) chevron.classList.toggle('rotate-180', isOpen);
+    });
+
+    // 校招页：重置
+    document.getElementById('btn-campus-reset') && document.getElementById('btn-campus-reset').addEventListener('click', function () {
+      document.getElementById('campus-search') && (document.getElementById('campus-search').value = '');
+      document.querySelectorAll('#page-campus-list .filter-pill:not(.filter-more)').forEach(function (p) { p.classList.remove('active'); });
+      document.querySelectorAll('#page-campus-list .js-deadline-quick').forEach(function (b) { b.classList.remove('border-primary', 'bg-primary/10', 'text-primary'); });
+      var startEnd = document.querySelectorAll('#page-campus-list input[placeholder=\"开始\"], #page-campus-list input[placeholder=\"结束\"]');
+      startEnd.forEach(function (i) { i.value = ''; });
+      var expandArea = document.getElementById('campus-filter-expand');
+      var toggleBtn = document.getElementById('btn-campus-filter-toggle');
+      if (expandArea && toggleBtn) { expandArea.classList.add('hidden'); var ch = document.querySelector('#page-campus-list .js-filter-chevron'); if (ch) ch.classList.remove('rotate-180'); }
+      alert('模拟：已重置筛选条件');
+    });
+
+    // 校招页：网申截止快捷（日期在展开区内）
+    document.querySelectorAll('#page-campus-list .js-deadline-quick').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('#page-campus-list .js-deadline-quick').forEach(function (b) { b.classList.remove('border-primary', 'bg-primary/10', 'text-primary'); });
+        this.classList.add('border-primary', 'bg-primary/10', 'text-primary');
+        var range = this.getAttribute('data-range');
+        var start = document.querySelector('#page-campus-list input[placeholder=\"开始\"]');
+        var end = document.querySelector('#page-campus-list input[placeholder=\"结束\"]');
+        if (!start || !end) return;
+        var today = new Date();
+        if (range === 'today') {
+          start.value = end.value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+        } else if (range === '3' || range === '7') {
+          var d = range === '3' ? 3 : 7;
+          start.value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+          var endD = new Date(today);
+          endD.setDate(endD.getDate() + d);
+          end.value = endD.getFullYear() + '-' + String(endD.getMonth() + 1).padStart(2, '0') + '-' + String(endD.getDate()).padStart(2, '0');
+        }
+      });
+    });
+
+    // 校招页：筛选 pill 多选（点击切换 active）
+    document.querySelectorAll('#page-campus-list .filter-pill:not(.filter-more)').forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        this.classList.toggle('active');
+      });
+    });
+
+    // 校招页：「更多」打开弹窗占位
+    document.querySelectorAll('#page-campus-list .filter-more').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var dim = this.getAttribute('data-more');
+        var titles = { type: '招聘类型', industry: '行业', city: '城市', scope: '招聘范围' };
+        var titleEl = document.getElementById('modal-filter-more-title');
+        var optionsEl = document.getElementById('modal-filter-more-options');
+        if (titleEl) titleEl.textContent = (titles[dim] || '更多') + '（多选）';
+        if (optionsEl) {
+          optionsEl.innerHTML = '';
+          var opts = dim === 'type' ? ['26届秋招补录', '27届实习生'] : dim === 'industry' ? ['新能源', '教育/科研', '法律/咨询'] : dim === 'scope' ? ['28届', '留学生'] : ['深圳', '杭州', '成都'];
+          opts.forEach(function (v) {
+            var lb = document.createElement('label');
+            lb.className = 'flex items-center gap-2 cursor-pointer';
+            lb.innerHTML = '<input type="checkbox" class="rounded border-slate-300" /> <span class="text-sm">' + v + '</span>';
+            optionsEl.appendChild(lb);
+          });
+        }
+        document.getElementById('modal-filter-more').style.display = 'flex';
+      });
+    });
+
+    // 校招页：保存当前筛选
+    document.getElementById('btn-save-filter') && document.getElementById('btn-save-filter').addEventListener('click', function () {
+      document.getElementById('save-filter-name').value = '';
+      document.getElementById('modal-save-filter').style.display = 'flex';
+    });
+
+    // 首行筛选：求职进度、保存筛选、仅看收藏 — 未登录/未开会员点击时弹登录或跳转套餐
+    document.getElementById('campus-progress-select') && document.getElementById('campus-progress-select').addEventListener('change', function () {
+      if (!requireCampusAuth()) { this.value = ''; return; }
+    });
+    document.getElementById('btn-save-filter') && document.getElementById('btn-save-filter').addEventListener('click', function () {
+      if (!isLoggedIn) { openLoginModal(true); return; }
+      document.getElementById('save-filter-name').value = '';
+      document.getElementById('modal-save-filter').style.display = 'flex';
+    });
+    document.getElementById('chk-fav-only') && document.getElementById('chk-fav-only').addEventListener('click', function () {
+      if (this.checked && !requireCampusAuth()) { this.checked = false; }
+    });
+    document.getElementById('campus-filter-group-select') && document.getElementById('campus-filter-group-select').addEventListener('focus', function () {
+      if (!isLoggedIn) { openLoginModal(true); }
+    });
+
+    // 操作专区：已开会员时标记进度 — 选「已投递」弹出填写投递岗位
+    document.querySelectorAll('.js-stage-select').forEach(function (el) {
+      el.addEventListener('change', function () {
+        if (!hasCampusMember) return;
+        if (this.value === '已投递') {
+          document.getElementById('input-applied-job').value = '';
+          document.getElementById('modal-applied-job').style.display = 'flex';
+        } else {
+          alert('模拟：已更新投递进度，可在个人中心/投递看板查看');
+        }
+      });
+    });
+    document.getElementById('btn-confirm-applied-job') && document.getElementById('btn-confirm-applied-job').addEventListener('click', function () {
+      closeModal('modal-applied-job');
+      alert('模拟：已保存投递岗位，进度已更新');
+    });
+
+    // 操作专区：编辑备注 — 弹窗填写备注内容
+    document.querySelectorAll('.js-remark-btn').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!requireCampusAuth()) return;
+        document.getElementById('input-remark').value = '';
+        document.getElementById('modal-remark').style.display = 'flex';
+      });
+    });
+    document.getElementById('btn-confirm-remark') && document.getElementById('btn-confirm-remark').addEventListener('click', function () {
+      closeModal('modal-remark');
+      document.getElementById('input-remark').value = '';
+      alert('模拟：备注已保存');
+    });
+
+    function requireCareerAuth() {
+      if (!isLoggedIn) { openLoginModal(true); return false; }
+      if (!hasCareerMember) { showPage('package'); return false; }
+      return true;
+    }
+
+    // 事业编页：筛选展开/收起
+    document.getElementById('btn-career-filter-toggle') && document.getElementById('btn-career-filter-toggle').addEventListener('click', function () {
+      var area = document.getElementById('career-filter-expand');
+      var chevron = document.querySelector('#page-career-list .js-career-filter-chevron');
+      if (!area) return;
+      var isOpen = !area.classList.contains('hidden');
+      area.classList.toggle('hidden', isOpen);
+      if (chevron) chevron.classList.toggle('rotate-180', isOpen);
+    });
+
+    // 事业编页：重置
+    document.getElementById('btn-career-reset') && document.getElementById('btn-career-reset').addEventListener('click', function () {
+      document.getElementById('career-search') && (document.getElementById('career-search').value = '');
+      document.querySelectorAll('#page-career-list .filter-pill').forEach(function (p) { p.classList.remove('active'); });
+      document.querySelectorAll('#page-career-list .filter-pill[data-value="全部"]').forEach(function (p) { p.classList.add('active'); });
+      document.querySelectorAll('#page-career-list .js-career-deadline-quick').forEach(function (b) { b.classList.remove('border-primary', 'bg-primary/10', 'text-primary'); });
+      var startEnd = document.querySelectorAll('#page-career-list #career-filter-expand input[placeholder=\"开始\"], #page-career-list #career-filter-expand input[placeholder=\"结束\"]');
+      if (startEnd.length) startEnd.forEach(function (i) { i.value = ''; });
+      var expandArea = document.getElementById('career-filter-expand');
+      if (expandArea) { expandArea.classList.add('hidden'); var ch = document.querySelector('#page-career-list .js-career-filter-chevron'); if (ch) ch.classList.remove('rotate-180'); }
+      alert('模拟：已重置筛选条件');
+    });
+
+    // 事业编页：报名截止快捷
+    document.querySelectorAll('#page-career-list .js-career-deadline-quick').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('#page-career-list .js-career-deadline-quick').forEach(function (b) { b.classList.remove('border-primary', 'bg-primary/10', 'text-primary'); });
+        this.classList.add('border-primary', 'bg-primary/10', 'text-primary');
+        var range = this.getAttribute('data-range');
+        var start = document.querySelector('#page-career-list #career-filter-expand input[placeholder=\"开始\"]');
+        var end = document.querySelector('#page-career-list #career-filter-expand input[placeholder=\"结束\"]');
+        if (!start || !end) return;
+        var today = new Date();
+        if (range === 'today') {
+          start.value = end.value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+        } else if (range === '3' || range === '7') {
+          var d = range === '3' ? 3 : 7;
+          start.value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+          var endD = new Date(today);
+          endD.setDate(endD.getDate() + d);
+          end.value = endD.getFullYear() + '-' + String(endD.getMonth() + 1).padStart(2, '0') + '-' + String(endD.getDate()).padStart(2, '0');
+        }
+      });
+    });
+
+    // 事业编页：筛选 pill 多选（类型、学历等，全部为单选逻辑：选全部则其他取消）
+    document.querySelectorAll('#page-career-list .filter-pill').forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        var filter = this.getAttribute('data-filter');
+        var val = this.getAttribute('data-value');
+        if (val === '全部') {
+          document.querySelectorAll('#page-career-list .filter-pill[data-filter="' + filter + '"]').forEach(function (p) { p.classList.remove('active'); });
+          this.classList.add('active');
+        } else {
+          document.querySelectorAll('#page-career-list .filter-pill[data-filter="' + filter + '"][data-value="全部"]').forEach(function (p) { p.classList.remove('active'); });
+          this.classList.toggle('active');
+        }
+      });
+    });
+
+    // 事业编页：保存当前筛选、求职进度、仅看收藏 — 未登录/未开会员引导
+    document.getElementById('btn-career-save-filter') && document.getElementById('btn-career-save-filter').addEventListener('click', function () {
+      if (!isLoggedIn) { openLoginModal(true); return; }
+      document.getElementById('save-filter-name').value = '';
+      document.getElementById('modal-save-filter').style.display = 'flex';
+    });
+    document.getElementById('career-progress-select') && document.getElementById('career-progress-select').addEventListener('change', function () {
+      if (!requireCareerAuth()) { this.value = ''; return; }
+    });
+    document.getElementById('chk-career-fav-only') && document.getElementById('chk-career-fav-only').addEventListener('click', function () {
+      if (this.checked && !requireCareerAuth()) { this.checked = false; }
+    });
+    document.getElementById('career-filter-group-select') && document.getElementById('career-filter-group-select').addEventListener('focus', function () {
+      if (!isLoggedIn) openLoginModal(true);
+    });
+
+    // 事业编：模拟已开通事业编会员
+    document.getElementById('chk-simulate-career-member') && document.getElementById('chk-simulate-career-member').addEventListener('change', function () {
+      hasCareerMember = this.checked;
+      updateUI();
+    });
+
+    // 事业编：查看详情 → 跳转详情页
+    document.querySelectorAll('.js-career-detail-link').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        showPage('career-detail');
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      updateUI();
+      document.querySelectorAll('[data-action=\"campus-apply\"]').forEach(function (el) {
+        el.addEventListener('click', function (e) { e.preventDefault(); handleCampusApplyClick(); });
+      });
+      document.querySelectorAll('[data-action=\"campus-original\"]').forEach(function (el) {
+        el.addEventListener('click', function (e) { handleCampusOriginalClick(e); });
+      });
+      document.querySelectorAll('[data-action=\"career-original\"]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          handleCareerOriginalClick();
         });
       });
-    }
+      // 面试资料：打开阅读器（预览/已购），并记录当前资料 ID 以控制购买遮罩
+      function openDocReader(docId) {
+        currentDocIdInView = String(docId || '2');
+        var titleEl = document.getElementById('docs-view-title');
+        if (titleEl && docId === '2') titleEl.textContent = '事业单位结构化面试资料';
+        if (titleEl && docId === '1') titleEl.textContent = '某大厂产品岗面试真题';
+        showPage('docs-view');
+        updateUI();
+      }
+      document.querySelectorAll('.js-doc-open').forEach(function (el) {
+        el.addEventListener('click', function () {
+          openDocReader(this.getAttribute('data-doc'));
+        });
+      });
+      document.querySelectorAll('.docs-mine-item').forEach(function (el) {
+        el.addEventListener('click', function () {
+          openDocReader(this.getAttribute('data-doc'));
+        });
+      });
 
-    // 交互绑定
-    document.getElementById('btnLogin').addEventListener('click', function () {
-      if (!isLoggedIn) openLogin();
-      else alert('已登录（模拟），这里可跳到个人中心。');
-    });
+      // 面试资料：商城/我的资料 Tab
+      document.querySelectorAll('#page-docs .docs-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var t = this.getAttribute('data-docstab');
+          document.querySelectorAll('#page-docs .docs-tab').forEach(function (b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          document.getElementById('docs-market') && document.getElementById('docs-market').classList.toggle('hidden', t !== 'market');
+          document.getElementById('docs-mine') && document.getElementById('docs-mine').classList.toggle('hidden', t !== 'mine');
+        });
+      });
 
-    document.getElementById('campus-banner-btn').addEventListener('click', function () {
-      if (!isLoggedIn) openLogin();
-      else if (!hasCampusMember) openPaywall();
-    });
+      // 面试资料：行业菜单选中态（仅 UI）
+      document.querySelectorAll('#page-docs .docs-industry').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('#page-docs .docs-industry').forEach(function (b) { b.classList.remove('bg-primary/10', 'text-primary', 'font-medium'); b.classList.add('hover:bg-slate-50'); });
+          this.classList.add('bg-primary/10', 'text-primary', 'font-medium');
+        });
+      });
 
-    document.querySelectorAll('[data-action="campus-apply"]').forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (!isLoggedIn) openLogin();
-        else if (!hasCampusMember) openPaywall();
-        else alert('模拟：写入投递记录并打开投递链接');
+      // 阅读器购买按钮（购买当前正在看的资料）
+      document.getElementById('btn-doc-buy') && document.getElementById('btn-doc-buy').addEventListener('click', function () {
+        var id = currentDocIdInView || '1';
+        var title = id === '2' ? '事业单位结构化面试资料' : '某大厂产品岗面试真题';
+        openDocPay(id, title, '¥9.9');
+      });
+      // 阅读器下载按钮（已购下载带水印 PDF，未购则引导购买）
+      document.getElementById('btn-doc-download') && document.getElementById('btn-doc-download').addEventListener('click', function () {
+        var id = currentDocIdInView || '1';
+        var title = id === '2' ? '事业单位结构化面试资料' : '某大厂产品岗面试真题';
+        if (!purchasedDocs[id]) {
+          openDocPay(id, title, '¥9.9');
+        } else {
+          alert('原型：已购，模拟下载带个人水印的 PDF 文件');
+        }
       });
     });
-
-    // 初始渲染
-    updateCampusUI();
   </script>
 </body>
 </html>
