@@ -71,7 +71,7 @@
         </button>
         <!-- 非登录：显示登录按钮 -->
         <div id="header-guest" class="flex items-center gap-3">
-          <button type="button" id="btnLogin" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium transition-default cursor-pointer">求职者登录</button>
+        <button type="button" id="btnLogin" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium transition-default cursor-pointer">求职者登录</button>
         </div>
         <!-- 已登录：头像 + 下拉 -->
         <div id="header-user" class="hidden relative">
@@ -429,7 +429,7 @@
           <div id="career-banner-cta" class="bg-primary/5 border border-primary/20 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
             <p class="text-sm text-slate-700">购买事业编会员可查看报名/原文链接，管理投递进度、使用投递看板与简历库。</p>
             <button type="button" id="btn-career-open-member" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-default shrink-0">立即开启会员权益</button>
-          </div>
+        </div>
           <div id="career-banner-member" class="hidden text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5">您已是事业编会员，可查看报名链接、使用投递看板与简历管理。</div>
         </div>
         <div class="mb-4 flex items-center gap-2 text-sm text-slate-600">
@@ -506,19 +506,19 @@
         <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card">
           <div class="overflow-x-auto">
             <table class="w-full min-w-[1200px] text-sm">
-              <thead><tr class="bg-slate-50 border-b border-slate-200">
-                <th class="text-left py-3 px-4 font-medium text-slate-700">更新时间</th>
-                <th class="text-left py-3 px-4 font-medium text-slate-700">公告标题</th>
+            <thead><tr class="bg-slate-50 border-b border-slate-200">
+              <th class="text-left py-3 px-4 font-medium text-slate-700">更新时间</th>
+              <th class="text-left py-3 px-4 font-medium text-slate-700">公告标题</th>
                 <th class="text-left py-3 px-4 font-medium text-slate-700">省份/市/区域</th>
-                <th class="text-left py-3 px-4 font-medium text-slate-700">类型</th>
+              <th class="text-left py-3 px-4 font-medium text-slate-700">类型</th>
                 <th class="text-left py-3 px-4 font-medium text-slate-700">报名时间</th>
-                <th class="text-left py-3 px-4 font-medium text-slate-700">招聘人数</th>
+              <th class="text-left py-3 px-4 font-medium text-slate-700">招聘人数</th>
                 <th class="text-left py-3 px-4 font-medium text-slate-700">学历要求</th>
                 <th class="text-left py-3 px-4 font-medium text-slate-700">年龄要求</th>
                 <th class="text-left py-3 px-4 font-medium text-slate-700">报名链接</th>
                 <th class="text-left py-3 px-4 font-medium text-slate-700">操作专区</th>
-              </tr></thead>
-              <tbody>
+            </tr></thead>
+            <tbody>
                 <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-default">
                   <td class="py-3 px-4 text-slate-600">2026.02.25</td>
                   <td class="py-3 px-4"><a href="#" class="text-accent-light cursor-pointer hover:underline js-career-detail-link">某省 2026 年事业单位公开招聘</a></td>
@@ -557,9 +557,9 @@
                     <button type="button" class="p-1 rounded text-slate-400 hover:text-primary hover:bg-primary/10 transition-default cursor-pointer js-career-fav ml-1" title="收藏" aria-label="收藏"><i data-lucide="star" class="w-4 h-4"></i></button>
                   </td>
                 </tr>
-              </tbody>
-            </table>
-          </div>
+            </tbody>
+          </table>
+        </div>
         </div>
         <p class="mt-4 text-sm text-slate-500">共 2 条，当前第 1 页</p>
       </div>
@@ -632,7 +632,7 @@
             <button type="button" class="docs-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer active" data-docstab="market">资料商城</button>
             <button type="button" class="docs-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer" data-docstab="mine">我的资料</button>
           </div>
-        </div>
+          </div>
 
         <!-- 资料商城 -->
         <div id="docs-market" class="docs-view">
@@ -687,9 +687,9 @@
                       <button type="button" class="btn-primary px-3 py-1 rounded text-xs cursor-pointer js-doc-open" data-doc="2">查看</button>
                     </div>
                   </div>
-                </div>
-              </div>
-            </section>
+        </div>
+      </div>
+    </section>
           </div>
         </div>
 
@@ -1079,22 +1079,22 @@
         </div>
         <!-- 会员态：完整看板 -->
         <div id="board-member" class="hidden">
-          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-              <button type="button" class="nav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer active" data-view="kanban">看板</button>
-              <button type="button" class="nav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer" data-view="list">列表</button>
-              <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-28"><option>全部分组</option><option>冲刺</option><option>保底</option></select>
-            </div>
-            <button type="button" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">新增投递记录</button>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div class="flex items-center gap-2">
+            <button type="button" class="nav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer active" data-view="kanban">看板</button>
+            <button type="button" class="nav-tab btn-outline px-3 py-2 rounded-lg text-sm font-medium cursor-pointer" data-view="list">列表</button>
+            <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-28"><option>全部分组</option><option>冲刺</option><option>保底</option></select>
           </div>
-          <div id="board-kanban" class="flex gap-4 overflow-x-auto pb-4">
-            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">已投递</div><div class="rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default mb-2">某公司 - 产品岗<br><span class="text-xs text-slate-400">校招表 · 2026-02-20</span></div></div>
-            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">笔试</div><div class="rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default">某单位 - 综合岗<br><span class="text-xs text-slate-400">事业编 · 2026-02-18</span></div></div>
-            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">一面</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
-            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">二面/终面</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
-            <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">OC / 已拒</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
-          </div>
-          <div id="board-list" class="hidden rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card"><table class="w-full text-sm"><thead><tr class="bg-slate-50 border-b border-slate-200"><th class="text-left py-3 px-4 font-medium text-slate-700">公司</th><th class="text-left py-3 px-4 font-medium text-slate-700">岗位</th><th class="text-left py-3 px-4 font-medium text-slate-700">来源</th><th class="text-left py-3 px-4 font-medium text-slate-700">投递日期</th><th class="text-left py-3 px-4 font-medium text-slate-700">阶段</th><th class="text-left py-3 px-4 font-medium text-slate-700">操作</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-3 px-4">某公司</td><td class="py-3 px-4">产品岗</td><td class="py-3 px-4">校招表</td><td class="py-3 px-4">2026-02-20</td><td class="py-3 px-4">已投递</td><td class="py-3 px-4"><button type="button" class="btn-outline px-2 py-1 rounded text-xs cursor-pointer">编辑</button></td></tr></tbody></table></div>
+          <button type="button" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">新增投递记录</button>
+        </div>
+        <div id="board-kanban" class="flex gap-4 overflow-x-auto pb-4">
+          <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">已投递</div><div class="rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default mb-2">某公司 - 产品岗<br><span class="text-xs text-slate-400">校招表 · 2026-02-20</span></div></div>
+          <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">笔试</div><div class="rounded-lg border border-slate-200 bg-white p-3 cursor-pointer hover:shadow-card transition-default">某单位 - 综合岗<br><span class="text-xs text-slate-400">事业编 · 2026-02-18</span></div></div>
+          <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">一面</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
+          <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">二面/终面</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
+          <div class="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50/50 p-4"><div class="font-medium text-slate-700 mb-3">OC / 已拒</div><div class="text-sm text-slate-400 py-2">暂无</div></div>
+        </div>
+        <div id="board-list" class="hidden rounded-xl border border-slate-200 bg-white overflow-hidden shadow-card"><table class="w-full text-sm"><thead><tr class="bg-slate-50 border-b border-slate-200"><th class="text-left py-3 px-4 font-medium text-slate-700">公司</th><th class="text-left py-3 px-4 font-medium text-slate-700">岗位</th><th class="text-left py-3 px-4 font-medium text-slate-700">来源</th><th class="text-left py-3 px-4 font-medium text-slate-700">投递日期</th><th class="text-left py-3 px-4 font-medium text-slate-700">阶段</th><th class="text-left py-3 px-4 font-medium text-slate-700">操作</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-3 px-4">某公司</td><td class="py-3 px-4">产品岗</td><td class="py-3 px-4">校招表</td><td class="py-3 px-4">2026-02-20</td><td class="py-3 px-4">已投递</td><td class="py-3 px-4"><button type="button" class="btn-outline px-2 py-1 rounded text-xs cursor-pointer">编辑</button></td></tr></tbody></table></div>
           <p class="mt-4 text-sm text-slate-500">简历库入口：<a href="#" onclick="showPage('resume'); return false;" class="text-accent-light cursor-pointer hover:underline">管理我的简历</a></p>
         </div>
       </div>
@@ -1111,12 +1111,12 @@
         </div>
         <!-- 登录态（含非会员与会员，通过 JS 显隐区块） -->
         <div id="profile-logged" class="hidden">
-          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">基本信息</div><div class="flex items-center gap-4"><div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i data-lucide="user" class="w-7 h-7"></i></div><div>微信昵称（登录后显示）</div></div></div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">基本信息</div><div class="flex items-center gap-4"><div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i data-lucide="user" class="w-7 h-7"></i></div><div>微信昵称（登录后显示）</div></div></div>
           <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">我的权益</div><p class="mb-2 text-slate-600">校招会员：<span id="profile-campus-member-text">未开通</span> <span id="profile-campus-member-btn"><button type="button" class="btn-primary ml-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer" onclick="showPage('package')">立即开通</button></span></p><p class="mb-2 text-slate-600">事业编会员：<span id="profile-career-member-text">未开通</span> <span id="profile-career-member-btn"><button type="button" class="btn-primary ml-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer" onclick="showPage('package')">立即开通</button></span></p><p class="text-slate-600 mt-2">已购资料：<a href="#" onclick="showPage('benefits'); return false;" class="text-accent-light cursor-pointer hover:underline">查看已购资料</a></p></div>
           <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">投递概览</div><div id="profile-board-guest" class="text-slate-600"><p class="mb-2">开通校招或事业编会员后，可使用投递看板管理进度。</p><button type="button" class="btn-primary px-4 py-2 rounded-lg text-sm cursor-pointer" onclick="showPage('package')">开通会员</button></div><div id="profile-board-member" class="hidden"><p class="text-slate-600 mb-2">已投递 2 · 笔试 1 · 面试 0</p><a href="#" onclick="showPage('board'); return false;" class="text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1">进入投递看板 <i data-lucide="arrow-right" class="w-4 h-4"></i></a></div></div>
           <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">我的简历</div><p class="text-slate-600 mb-2">会员可在简历库管理多份简历并关联投递。</p><div id="profile-resume-guest" class="text-slate-500 text-sm">开通会员后可用</div><a id="profile-resume-link" href="#" onclick="showPage('resume'); return false;" class="hidden text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1"><i data-lucide="file-text" class="w-4 h-4"></i> 管理我的简历</a></div>
           <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card mb-6"><div class="font-semibold text-slate-800 mb-4">我的收藏</div><p class="text-slate-600 mb-2">校招/事业编收藏，可在对应表页「仅看收藏」筛选。</p><a href="#" onclick="showPage('campus-list'); return false;" class="text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1"><i data-lucide="star" class="w-4 h-4"></i> 去校招表</a> <a href="#" onclick="showPage('career-list'); return false;" class="text-accent-light cursor-pointer hover:underline inline-flex items-center gap-1 ml-3">事业编表</a></div>
-          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card"><div class="font-semibold text-slate-800 mb-4">我的订单</div><table class="w-full text-sm"><thead><tr class="border-b border-slate-200"><th class="text-left py-2 font-medium text-slate-700">订单号</th><th class="text-left py-2 font-medium text-slate-700">商品</th><th class="text-left py-2 font-medium text-slate-700">金额</th><th class="text-left py-2 font-medium text-slate-700">状态</th><th class="text-left py-2 font-medium text-slate-700">时间</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-2">ORD20260201001</td><td class="py-2">事业编会员 1年</td><td class="py-2">¥19.9</td><td class="py-2">已支付</td><td class="py-2">2026-02-01</td></tr></tbody></table></div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-card"><div class="font-semibold text-slate-800 mb-4">我的订单</div><table class="w-full text-sm"><thead><tr class="border-b border-slate-200"><th class="text-left py-2 font-medium text-slate-700">订单号</th><th class="text-left py-2 font-medium text-slate-700">商品</th><th class="text-left py-2 font-medium text-slate-700">金额</th><th class="text-left py-2 font-medium text-slate-700">状态</th><th class="text-left py-2 font-medium text-slate-700">时间</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-2">ORD20260201001</td><td class="py-2">事业编会员 1年</td><td class="py-2">¥19.9</td><td class="py-2">已支付</td><td class="py-2">2026-02-01</td></tr></tbody></table></div>
         </div>
       </div>
     </section>
@@ -1212,9 +1212,9 @@
       <!-- 微信扫码（默认） -->
       <div id="login-panel-wechat">
         <p class="text-xs text-slate-500 mb-4">默认推荐：关注公众号后自动完成登录与注册</p>
-        <div class="w-48 h-48 mx-auto mb-4 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
-          <span class="text-xs">二维码占位</span>
-        </div>
+      <div class="w-48 h-48 mx-auto mb-4 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+        <span class="text-xs">二维码占位</span>
+      </div>
         <p class="text-xs text-slate-500 mb-3 text-center">请使用微信扫描二维码，关注「Offer信息站」公众号后返回本页</p>
         <button type="button" class="btn-primary w-full py-2.5 rounded-lg font-medium cursor-pointer" onclick="simulateLoginSuccess()">模拟扫码成功</button>
       </div>
@@ -1525,13 +1525,13 @@
         var lockIcon = el.querySelector('.js-career-lock-icon');
         var textEl = el.querySelector('.js-career-link-text');
         if (textEl) {
-          if (!isLoggedIn) {
+        if (!isLoggedIn) {
             textEl.textContent = '登录后可查看 🔒';
             if (lockIcon) lockIcon.style.display = '';
-          } else if (!hasCareerMember) {
+        } else if (!hasCareerMember) {
             textEl.textContent = '开通会员解锁 🔒';
             if (lockIcon) lockIcon.style.display = '';
-          } else {
+        } else {
             textEl.textContent = '原文链接';
             if (lockIcon) lockIcon.style.display = 'none';
           }

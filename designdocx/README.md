@@ -9,17 +9,23 @@
 ```
 xiaoy/
 ├── README.md                          # 本文件：项目总览与目录说明
-├── offerAI 产品featureList V2.md      # 产品功能清单（与 PRD 编号对应）
-├── offerAI 产品featureList.md          # 功能清单历史版本
-├── offerAI_ER图.mmd                    # 数据 ER 图（Mermaid 源文件）
-├── offerAI 数据ER图.md                 # 数据 ER 图（含说明）
-├── 时序图01_微信扫码登录.mmd           # 时序图 01～06
+├── TECH_DESIGN_OVERVIEW.md            # 技术设计总览与索引（细化在 tech/）
+├── tech/                              # 技术设计文档（开发实现方案）
+│   ├── README.md                      # 技术文档清单
+│   ├── 01_技术栈与架构.md
+│   ├── 02_数据模型与存储.md
+│   └── 03_接口与鉴权.md
+├── offerAI 产品featureList V2.md     # 产品功能清单（与 PRD 编号对应）
+├── offerAI 产品featureList.md        # 功能清单历史版本
+├── offerAI_ER图.mmd                   # 数据 ER 图（Mermaid 源文件）
+├── offerAI 数据ER图.md                # 数据 ER 图（含说明）
+├── 时序图01_微信扫码登录.mmd          # 时序图 01～06
 ├── 时序图02_校招信息表浏览与解锁.mmd
 ├── 时序图03_事业编信息表浏览与公告详情.mmd
 ├── 时序图04_面试资料预览与购买.mmd
 ├── 时序图05_会员购买.mmd
 ├── 时序图06_飞书多维表格定时增量同步到系统数据库.mmd
-├── offerAI 后台管理PRD_V1.md          # 后台 PRD 旧版（可归档，以 prd/ 为准）
+├── offerAI 后台管理PRD_V1.md         # 后台 PRD 旧版（可归档，以 prd/ 为准）
 └── prd/                               # 产品需求文档（按模块拆分）
     ├── README.md                      # PRD 撰写规范与索引
     └── backend/                       # 后台管理 PRD
@@ -40,8 +46,9 @@ xiaoy/
 | 文档类型 | 用途 | 与 PRD 关系 |
 |----------|------|-------------|
 | FeatureList V2 | 功能范围、优先级、编号 | 每个 PRD 文档头部注明对应 FeatureList 编号 |
-| ER 图 | 数据表与字段、关系 | PRD 中字段键名、校验与 ER 实体一致 |
+| ER 图 | 数据表与字段、关系 | PRD 中字段键名、校验与 ER 实体一致；tech/02 与 ER 对齐 |
 | 时序图 | 关键流程 | PRD 中「流程逻辑」可引用对应时序图 |
+| tech/* | 技术方案（栈、数据模型、接口与鉴权） | 开发实现依据；与 PRD、ER 一致 |
 | prd/backend/* | 后台页面与逻辑规格 | 开发/AI 直接按 PRD 实现 |
 
 ---
